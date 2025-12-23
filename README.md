@@ -36,4 +36,4 @@ Puedes editar directamente en el servidor si SOLO modificas:
 *   Lógica PHP.
 *   Clases de Tailwind que **YA** existan visualmente en otra parte del sitio.
 
-> **Contacto**: Si tienes dudas sobre el entorno de Node.js o Tailwind, contacta al administrador del proyecto antes de modificar archivos CSS manualmente.
+> **Contacto**: Si tienes dudas sobre el entorno de Node.js o Tailwind, contacta al creador del proyecto antes de modificar archivos CSS manualmente.
