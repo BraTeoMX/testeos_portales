@@ -53,7 +53,7 @@
                     </svg>
                 </div>
                 <!-- Input con padding ajustado manualmente para evitar superposicion -->
-                <input type="text" id="searchInput" class="block w-full p-5 pl-14 text-lg text-gray-900 border border-gray-200 rounded-2xl bg-white shadow-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-900 dark:focus:border-blue-500 transition-all outline-none" placeholder="¿Qué servicio buscas hoy? (ej. Vacaciones, Toner...)" required autocomplete="off">
+                <input type="text" id="searchInput" class="block w-full p-5 pl-14 text-lg text-gray-900 border border-gray-200 rounded-2xl bg-white shadow-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-900 dark:focus:border-blue-500 transition-all outline-none" placeholder="¿Qué servicio buscas hoy? (ej. Vacaciones, Guia, Avances Producción...)" required autocomplete="off">
             </div>
         </div>
 
@@ -84,7 +84,7 @@
                 ['title' => 'Control Accesos', 'desc' => 'Bitácora de entradas y salidas', 'url' => 'http://128.150.102.131:8080/planta/loginvista.html', 'img' => './img/control2.jpg', 'category' => 'Seguridad', 'keywords' => 'vigilancia registro visitas puerta'],
                 ['title' => 'SGD', 'desc' => 'Sistema de Gestión (Vacaciones)', 'url' => 'http://128.150.102.131:8000', 'img' => './img/sgd.png', 'category' => 'RH', 'keywords' => 'vacaciones permisos faltas recursos humanos nomina'],
                 ['title' => 'Dashboard SGD', 'desc' => 'Visualización de métricas SGD', 'url' => 'http://128.150.102.131:8010', 'img' => './img/dashboardSGD.png', 'category' => 'RH', 'keywords' => 'graficas reportes personal estadisticas'],
-                ['title' => 'Avances Producción', 'desc' => 'Avances de producción en tiempo real', 'url' => 'http://128.150.102.40:8010', 'img' => './img/produccion.png', 'category' => 'Producción', 'keywords' => 'lineas meta avance hora x hora'],
+                ['title' => 'Avances de la Producción', 'desc' => 'Avances de producción en tiempo real', 'url' => 'http://128.150.102.40:8010', 'img' => './img/produccion.png', 'category' => 'Producción', 'keywords' => 'lineas meta avance hora x hora'],
                 ['title' => 'Backlog', 'desc' => 'Gestión de pendientes', 'url' => 'http://128.150.102.131:8030', 'img' => './img/backlog.png', 'category' => 'Producción', 'keywords' => 'pedidos ordenes carga trabajo'],
                 ['title' => 'Paquetería', 'desc' => 'Registro y seguimiento de guías', 'url' => 'http://128.150.102.40/registro_paqueteria', 'img' => './img/paqueteria.png', 'category' => 'Logística', 'keywords' => 'dhl fedex estafeta envios recepcion almacen'],
             ];
