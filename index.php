@@ -191,6 +191,17 @@
             }
         });
 
+        // --- Autofoco Inteligente ---
+        // Solo enfocar si es escritorio (ancho > 1024px) y NO es dispositivo táctil principal
+        document.addEventListener('DOMContentLoaded', () => {
+            const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+            const isNotTouch = window.matchMedia('(pointer: fine)').matches;
+
+            if (isDesktop && isNotTouch) {
+                searchInput.focus();
+            }
+        });
+
         // --- Toggle de Tema ---
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
