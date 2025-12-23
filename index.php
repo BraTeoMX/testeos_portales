@@ -35,35 +35,53 @@
             opacity: 0;
             /* Inicialmente oculto */
         }
+
+        .animate-spin-slow {
+            animation: spin 8s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gray-50 text-slate-900 dark:bg-slate-900 transition-colors duration-300 min-h-screen flex flex-col font-sans">
 
     <!-- Header con efecto Glassmorphism -->
-    <header class="sticky top-0 z-50 w-full backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-gray-200 dark:border-slate-800 shadow-sm">
+    <header class="sticky top-0 z-50 w-full backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-gray-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 w-1/3">
                 <!-- Logo Intimark -->
                 <img src="./img/logo.png" alt="Logo Intimark" class="h-10 w-auto object-contain transition-transform hover:scale-105">
             </div>
 
-            <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-slate-700 rounded-full text-sm p-2 transition-colors">
-                <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                </svg>
-                <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h1a1 1 0 100 2h-1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
-                </svg>
-            </button>
+            <!-- Saludo Dinámico Central (Icono + Texto) -->
+            <div id="header-greeting-container" class="hidden md:flex flex-row items-center justify-center gap-2 w-1/3 text-center animate-fade-in">
+                <!-- El contenido (Icono + Texto) se inyecta vía JS -->
+            </div>
+
+            <div class="flex items-center justify-end gap-3 w-1/3">
+                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-slate-700 rounded-full text-sm p-2 transition-colors">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h1a1 1 0 100 2h-1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-12 flex-grow">
         <div class="mb-12 text-center max-w-4xl mx-auto">
-            <!-- Saludo Dinámico -->
-            <h2 id="dynamic-greeting" class="text-xl font-medium text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wider">Bienvenido</h2>
-
             <h1 class="text-4xl font-extrabold tracking-tight leading-none text-slate-900 dark:text-white md:text-5xl lg:text-6xl mb-6">
                 Portal de servicios <span class="text-brown-600 dark:text-brown-500">INTIMARK</span>
             </h1>
@@ -126,7 +144,7 @@
                     'Default' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
                 ];
                 $catColor = $badgeColors[$card['category']] ?? $badgeColors['Default'];
-                // Retraso de animación escalonada (ms)
+                // Retraso de animación escalonada 
                 $delay = $index * 50;
             ?>
                 <div class="service-card animate-fade-in-up group relative bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden flex flex-col hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1"
@@ -172,21 +190,53 @@
     </footer>
 
     <script>
-        // --- Saludo Dinámico ---
+        // --- Saludo Dinámico con Iconos ---
         document.addEventListener('DOMContentLoaded', () => {
-            const greetingElement = document.getElementById('dynamic-greeting');
+            const container = document.getElementById('header-greeting-container');
             const hour = new Date().getHours();
-            let greetingText = 'Bienvenido';
+
+            // Iconos SVG (Simple paths para inline)
+            // Sol (Tarde 12-19)
+            const afternoonIcon = `<svg class="w-6 h-6 text-yellow-500 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`;
+
+            // Sol + Nube (Mañana 5-12)
+            const morningIcon = `<svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`; // Por simplicidad, variante similar pero con color amanecer
+
+            // Luna (Noche 19-5)
+            const moonIcon = `<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
+
+            let greetingText = '';
+            let iconHtml = '';
+            let textColorClass = '';
 
             if (hour >= 5 && hour < 12) {
                 greetingText = 'Buenos días';
+                iconHtml = morningIcon;
+                textColorClass = 'text-slate-700 dark:text-slate-200';
             } else if (hour >= 12 && hour < 19) {
                 greetingText = 'Buenas tardes';
+                iconHtml = afternoonIcon;
+                textColorClass = 'text-slate-700 dark:text-slate-200';
             } else {
                 greetingText = 'Buenas noches';
+                iconHtml = moonIcon;
+                textColorClass = 'text-slate-600 dark:text-slate-300';
             }
 
-            greetingElement.textContent = greetingText;
+            container.innerHTML = `
+                ${iconHtml}
+                <span class="font-medium text-sm md:text-base uppercase tracking-wider ${textColorClass}">${greetingText}</span>
+            `;
+        });
+
+        // --- Autofoco Inteligente ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+            const isNotTouch = window.matchMedia('(pointer: fine)').matches;
+
+            if (isDesktop && isNotTouch) {
+                searchInput.focus();
+            }
         });
 
         // --- Buscador Inteligente (Normalización de Acentos) ---
@@ -194,7 +244,6 @@
         const cards = document.querySelectorAll('.service-card');
         const noResults = document.getElementById('noResults');
 
-        // Normaliza texto: quita acentos y convierte a minúsculas
         function normalizeText(text) {
             return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
         }
@@ -231,17 +280,6 @@
                 noResults.classList.remove('hidden');
             } else {
                 noResults.classList.add('hidden');
-            }
-        });
-
-        // --- Autofoco Inteligente ---
-        // Solo enfocar si es escritorio (ancho > 1024px) y NO es dispositivo táctil principal
-        document.addEventListener('DOMContentLoaded', () => {
-            const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
-            const isNotTouch = window.matchMedia('(pointer: fine)').matches;
-
-            if (isDesktop && isNotTouch) {
-                searchInput.focus();
             }
         });
 
