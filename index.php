@@ -24,8 +24,8 @@
     <header class="sticky top-0 z-50 w-full backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-gray-200 dark:border-slate-800 shadow-sm">
         <div class="container mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30">I</div>
-                <span class="font-bold text-xl tracking-tight text-slate-800 dark:text-white">Portal Intimark</span>
+                <!-- Logo Intimark -->
+                <img src="./img/logo.png" alt="Logo Intimark" class="h-10 w-auto object-contain transition-transform hover:scale-105">
             </div>
 
             <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-slate-700 rounded-full text-sm p-2 transition-colors">
