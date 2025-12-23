@@ -42,11 +42,8 @@
     <main class="container mx-auto px-4 py-12 flex-grow">
         <div class="mb-12 text-center max-w-4xl mx-auto">
             <h1 class="text-4xl font-extrabold tracking-tight leading-none text-slate-900 dark:text-white md:text-5xl lg:text-6xl mb-6">
-                Servicios <span class="text-blue-600 dark:text-blue-500">Corporativos</span>
+                Portal de servicios <span class="text-brown-600 dark:text-brown-500">INTIMARK</span>
             </h1>
-            <p class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400 mb-8">
-                Acceso centralizado, seguro y eficiente a todas las herramientas y plataformas de Intimark.
-            </p>
 
             <!-- Barra de Búsqueda Mejorada -->
             <div class="relative w-full max-w-2xl mx-auto mt-8">
