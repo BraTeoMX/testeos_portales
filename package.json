@@ -1,0 +1,15 @@
+{
+  "name": "portal-intimark",
+  "version": "1.0.0",
+  "description": "Portal de Servicios Intimark",
+  "main": "index.php",
+  "scripts": {
+    "build": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}
