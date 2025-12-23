@@ -16,6 +16,26 @@
             document.documentElement.classList.remove('dark')
         }
     </script>
+    <!-- Estilos Personalizados para Animaciones -->
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+            /* Inicialmente oculto */
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50 text-slate-900 dark:bg-slate-900 transition-colors duration-300 min-h-screen flex flex-col font-sans">
@@ -41,6 +61,9 @@
 
     <main class="container mx-auto px-4 py-12 flex-grow">
         <div class="mb-12 text-center max-w-4xl mx-auto">
+            <!-- Saludo Dinámico -->
+            <h2 id="dynamic-greeting" class="text-xl font-medium text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wider">Bienvenido</h2>
+
             <h1 class="text-4xl font-extrabold tracking-tight leading-none text-slate-900 dark:text-white md:text-5xl lg:text-6xl mb-6">
                 Portal de servicios <span class="text-brown-600 dark:text-brown-500">INTIMARK</span>
             </h1>
@@ -89,7 +112,7 @@
                 ['title' => 'Paquetería', 'desc' => 'Registro y seguimiento de guías', 'url' => 'http://128.150.102.40/registro_paqueteria', 'img' => './img/paqueteria.png', 'category' => 'Logística', 'keywords' => 'dhl fedex estafeta envios recepcion almacen'],
             ];
 
-            foreach ($cards as $card):
+            foreach ($cards as $index => $card):
                 $imgSrc = isset($card['img']) && file_exists(__DIR__ . '/' . $card['img']) ? $card['img'] : $card['img'];
                 $badgeColors = [
                     'TI' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
@@ -103,8 +126,11 @@
                     'Default' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
                 ];
                 $catColor = $badgeColors[$card['category']] ?? $badgeColors['Default'];
+                // Retraso de animación escalonada (ms)
+                $delay = $index * 50;
             ?>
-                <div class="service-card group relative bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden flex flex-col hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1"
+                <div class="service-card animate-fade-in-up group relative bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden flex flex-col hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1"
+                    style="animation-delay: <?= $delay ?>ms;"
                     data-title="<?= strtolower($card['title']) ?>"
                     data-desc="<?= strtolower($card['desc']) ?>"
                     data-keywords="<?= strtolower($card['keywords']) ?>"
@@ -146,6 +172,23 @@
     </footer>
 
     <script>
+        // --- Saludo Dinámico ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingElement = document.getElementById('dynamic-greeting');
+            const hour = new Date().getHours();
+            let greetingText = 'Bienvenido';
+
+            if (hour >= 5 && hour < 12) {
+                greetingText = 'Buenos días';
+            } else if (hour >= 12 && hour < 19) {
+                greetingText = 'Buenas tardes';
+            } else {
+                greetingText = 'Buenas noches';
+            }
+
+            greetingElement.textContent = greetingText;
+        });
+
         // --- Buscador Inteligente (Normalización de Acentos) ---
         const searchInput = document.getElementById('searchInput');
         const cards = document.querySelectorAll('.service-card');
