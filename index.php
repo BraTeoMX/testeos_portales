@@ -53,7 +53,7 @@
                     </svg>
                 </div>
                 <!-- Input con padding ajustado manualmente para evitar superposicion -->
-                <input type="text" id="searchInput" class="block w-full p-5 pl-14 text-lg text-gray-900 border border-gray-200 rounded-2xl bg-white shadow-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-900 dark:focus:border-blue-500 transition-all outline-none" placeholder="¿Qué servicio buscas hoy? (ej. Vacaciones, Guia, Avances Producción...)" required autocomplete="off">
+                <input type="text" id="searchInput" class="block w-full p-5 pl-14 text-lg text-gray-900 border border-gray-200 rounded-2xl bg-white shadow-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-900 dark:focus:border-blue-500 transition-all outline-none" placeholder="¿Qué servicio buscas hoy? (ej. Vacaciones, Guia, Avances de la Producción...)" required autocomplete="off">
             </div>
         </div>
 
