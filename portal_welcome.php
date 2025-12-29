@@ -65,6 +65,15 @@
             height: 1.75rem;
             /* h-7 equivalent */
         }
+
+        /* Active Navigation Item */
+        .nav-active {
+            background-color: #0369a1 !important;
+            /* sky-700 */
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
     </style>
 </head>
 
@@ -224,14 +233,18 @@
         });
 
         function showSection(sectionId) {
+            // Update Menu Buttons
             document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove('bg-stone-800', 'text-white', 'shadow-lg');
+                // Reset all states
+                btn.classList.remove('nav-active');
                 btn.classList.add('text-stone-600', 'hover:bg-stone-100');
             });
+
+            // Add active styles to clicked button
             const activeBtn = document.getElementById('btn-' + sectionId);
             if (activeBtn) {
                 activeBtn.classList.remove('text-stone-600', 'hover:bg-stone-100');
-                activeBtn.classList.add('bg-stone-800', 'text-white', 'shadow-lg');
+                activeBtn.classList.add('nav-active');
             }
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.add('hidden');
