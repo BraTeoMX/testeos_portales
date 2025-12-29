@@ -10,55 +10,51 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* cursor: none; REMOVED per user request */
+            background-color: #f5f5f4;
         }
 
-        /* Cursor Glow (Blue Light) */
+        /* Cursor Glow */
         #cursor-glow {
             position: fixed;
             top: 0;
             left: 0;
             width: 400px;
-            /* Reduced size */
             height: 400px;
             border-radius: 50%;
-            /* Sky Blue Gradient */
-            background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0) 70%);
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0) 70%);
             transform: translate(-50%, -50%);
             pointer-events: none;
             mix-blend-mode: multiply;
             z-index: 0;
-            /* Behind everything */
             transition: background 0.3s ease;
         }
 
-        /* Nav Pills - Liquid Effect */
+        /* Nav Pills */
         .glass-pill-nav {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
 
         .nav-link {
             position: relative;
             z-index: 10;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Active State: White floating pill */
         .nav-link.active {
             background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            color: #0c4a6e;
-            /* Sky-900 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            color: #0284c7;
+            font-weight: 600;
         }
 
         .nav-link:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* Welcome Animation */
+        /* Animation */
         #welcome-overlay {
             position: fixed;
             inset: 0;
@@ -108,40 +104,93 @@
             }
         }
 
-        /* Calendar Grid Fix */
-        .calendar-grid {
+        /* Calendar Styles */
+        .cal-wrapper {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e7e5e4;
+            overflow: hidden;
+        }
+
+        .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 2px;
+            padding: 10px;
+        }
+
+        .cal-cell {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #57534e;
+            border-radius: 50%;
+        }
+
+        .cal-today {
+            background-color: #0ea5e9;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        /* Force Display for Debug */
+        .gadget-box {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            width: 250px;
+            z-index: 50;
+            display: block !important;
         }
     </style>
 </head>
 
-<body class="bg-stone-100 text-stone-800 h-screen overflow-hidden selection:bg-sky-200 selection:text-sky-900">
+<body class="text-stone-800 h-screen overflow-hidden selection:bg-sky-200 selection:text-sky-900 relative">
 
     <div id="cursor-glow"></div>
 
-    <!-- Welcome Overlay -->
     <div id="welcome-overlay">
         <img src="img/logo.png" alt="Logo" class="welcome-logo w-32 object-contain">
     </div>
 
-    <!-- Liquid Nav -->
-    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 hidden md:flex p-1.5 rounded-full glass-pill-nav fade-in" style="animation-delay: 1.2s;">
-        <button onclick="switchSection('avisos')" class="nav-link active px-6 py-2 rounded-full text-sm font-medium text-stone-600">Avisos</button>
-        <button onclick="switchSection('portales')" class="nav-link px-6 py-2 rounded-full text-sm font-medium text-stone-600">Portales</button>
-        <button onclick="switchSection('perfil')" class="nav-link px-6 py-2 rounded-full text-sm font-medium text-stone-600">Mi Perfil</button>
+    <!-- Nav -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex p-1.5 rounded-full glass-pill-nav fade-in" style="animation-delay: 1.2s;">
+        <button onclick="switchSection('avisos')" class="nav-link active px-6 py-2 rounded-full text-sm">Avisos</button>
+        <button onclick="switchSection('portales')" class="nav-link px-6 py-2 rounded-full text-sm">Portales</button>
+        <button onclick="switchSection('perfil')" class="nav-link px-6 py-2 rounded-full text-sm">Mi Perfil</button>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Content -->
     <main class="relative h-full w-full pt-28 px-4 md:px-12 lg:px-24 pb-12 overflow-y-auto z-10">
 
-        <!-- Portales View -->
-        <section id="section-portales" class="section-view hidden fade-in max-w-7xl mx-auto">
-            <header class="mb-8">
-                <h1 class="text-3xl font-light tracking-tight text-stone-800">Menú <span class="font-bold text-sky-600">Principal</span></h1>
+        <!-- Avisos -->
+        <section id="section-avisos" class="section-view fade-in max-w-6xl mx-auto block">
+            <header class="mb-8 pl-4 border-l-4 border-sky-500">
+                <h2 class="text-3xl font-light text-stone-800"><span class="font-extrabold text-sky-600 text-3xl">I</span>ntimark</h2>
+                <p class="text-sm text-stone-400">Panel de Comunicación Interna</p>
             </header>
 
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Main Notice -->
+                <div class="md:col-span-2 bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-xs font-bold">IMPORTANTE</span>
+                        <span class="text-xs text-stone-400">Hace 2 horas</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-3">Mantenimiento Global de Servidores</h3>
+                    <p class="text-stone-600 leading-relaxed">Se informa a todo el personal que este fin de semana se realizará una actualización crítica.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portales -->
+        <section id="section-portales" class="section-view hidden fade-in max-w-7xl mx-auto">
+            <header class="mb-8 pl-4 border-l-4 border-sky-500">
+                <h1 class="text-3xl font-light tracking-tight text-stone-800"><span class="font-extrabold text-sky-600 text-3xl">P</span>ortales</h1>
+            </header>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <?php
                 $apps = [
@@ -153,7 +202,7 @@
                     ['LOG', 'Paquetería', 'Entradas/Salidas', 'cyan-500', 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z', 'http://128.150.102.40/registro_paqueteria'],
                 ];
                 foreach ($apps as $app): ?>
-                    <a href="<?= $app[5] ?>" target="_blank" class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-white hover:border-sky-300 hover:shadow-lg hover:shadow-sky-100 transition-all duration-300 group">
+                    <a href="<?= $app[5] ?>" target="_blank" class="bg-white rounded-2xl p-5 border border-gray-100 hover:border-sky-300 hover:shadow-lg transition-all duration-300 group">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 rounded-xl bg-<?= $app[3] ?>/10 flex items-center justify-center text-<?= $app[3] ?> group-hover:scale-110 transition-transform">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +210,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-bold text-stone-800 group-hover:text-black"><?= $app[1] ?></h3>
+                                <h3 class="font-bold text-stone-800"><?= $app[1] ?></h3>
                                 <p class="text-xs text-stone-500"><?= $app[2] ?></p>
                             </div>
                         </div>
@@ -170,166 +219,101 @@
             </div>
         </section>
 
-        <!-- Avisos View -->
-        <section id="section-avisos" class="section-view fade-in max-w-6xl mx-auto block">
-            <header class="mb-8">
-                <h2 class="text-3xl font-light text-stone-800">Tablero de <span class="font-bold text-sky-600">Avisos</span></h2>
+        <!-- Perfil -->
+        <section id="section-perfil" class="section-view hidden fade-in max-w-6xl mx-auto">
+            <header class="mb-8 pl-4 border-l-4 border-sky-500">
+                <h1 class="text-3xl font-light tracking-tight text-stone-800"><span class="font-extrabold text-sky-600 text-3xl">M</span>i Perfil</h1>
             </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Main Notice -->
-                <div class="md:col-span-2 bg-white/60 backdrop-blur-md rounded-3xl p-8 border border-white shadow-sm">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-xs font-bold">IMPORTANTE</span>
-                        <span class="text-xs text-stone-400">Hace 2 horas</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-stone-800 mb-3">Mantenimiento Global de Servidores</h3>
-                    <p class="text-stone-600">
-                        Se informa a todo el personal que este fin de semana se realizará una actualización crítica.
-                        Los servicios podrían presentar intermitencia el sábado de 14:00 a 16:00 hrs.
-                    </p>
-                </div>
-
-                <!-- Side Notices -->
-                <div class="flex flex-col gap-4">
-                    <div class="bg-white/60 backdrop-blur-md rounded-3xl p-6 border border-white shadow-sm hover:bg-white transition-colors cursor-pointer">
-                        <h4 class="font-bold text-stone-800 text-sm mb-1">Nómina Disponible</h4>
-                        <p class="text-xs text-stone-500">Descarga tus recibos de la quincena.</p>
-                    </div>
-                    <div class="bg-white/60 backdrop-blur-md rounded-3xl p-6 border border-white shadow-sm hover:bg-white transition-colors cursor-pointer">
-                        <h4 class="font-bold text-stone-800 text-sm mb-1">Simulacro</h4>
-                        <p class="text-xs text-stone-500">Miércoles 11:00 AM, punto de reunión patio.</p>
-                    </div>
+            <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm flex items-center gap-6">
+                <div class="w-20 h-20 rounded-full bg-stone-100 flex items-center justify-center text-3xl">👤</div>
+                <div>
+                    <h2 class="text-xl font-bold text-stone-800">Usuario Invitado</h2>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FLOATING GADGET (Revised: Small, Auto-adjusting position, Correct Grid) -->
-    <!-- Placing it Fixed Top Right to avoid 'footer' overlap issues, and scaled down -->
-    <aside class="fixed top-24 right-8 z-30 hidden lg:block w-56 animate-fade-in-up">
-
-        <!-- Glass Container -->
-        <div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl p-4 transform transition-all hover:scale-105">
-
-            <!-- Clock -->
-            <div class="text-center mb-4 border-b border-gray-200 pb-3">
-                <div id="live-clock" class="text-2xl font-light text-stone-800 font-mono tracking-tight">--:--</div>
-                <div id="live-date" class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1">...</div>
+    <!-- PHP/HTML Rendered Gadget (NO JS REQUIRED FOR LAYOUT) -->
+    <aside class="gadget-box">
+        <div class="cal-wrapper">
+            <div class="p-4 border-b border-gray-100 text-center">
+                <div id="php-clock" class="text-2xl font-mono text-stone-800">--:--</div>
+                <div class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1">
+                    <?php
+                    setlocale(LC_TIME, 'es_ES.UTF-8', 'esp');
+                    echo strftime('%A %d de %B');
+                    ?>
+                </div>
             </div>
 
-            <!-- Calendar -->
-            <div>
-                <div class="flex justify-between items-center mb-2 px-1">
-                    <h3 id="cal-month" class="text-xs font-bold text-stone-700 capitalize">...</h3>
-                </div>
+            <div class="bg-gray-50 p-2 text-center text-[10px] font-bold text-stone-500 uppercase tracking-wider">
+                <?php echo strftime('%B %Y'); ?>
+            </div>
 
-                <div class="calendar-grid text-[10px] font-bold text-stone-400 mb-1 text-center">
-                    <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
-                </div>
+            <div class="cal-grid bg-white">
+                <div class="text-[9px] text-stone-400 font-bold text-center">D</div>
+                <div class="text-[9px] text-stone-400 font-bold text-center">L</div>
+                <div class="text-[9px] text-stone-400 font-bold text-center">M</div>
+                <div class="text-[9px] text-stone-400 font-bold text-center">M</div>
+                <div class="text-[9px] text-stone-400 font-bold text-center">J</div>
+                <div class="text-[9px] text-stone-400 font-bold text-center">V</div>
+                <div class="text-[9px] text-stone-400 font-bold text-center">S</div>
 
-                <!-- Explicit Grid Container for Days -->
-                <div id="mini-calendar" class="calendar-grid text-center">
-                    <!-- JS Injected -->
-                </div>
+                <?php
+                $month = date('m');
+                $year = date('Y');
+                $firstDay = date('w', strtotime("$year-$month-01"));
+                $daysInMonth = date('t', strtotime("$year-$month-01"));
+                $today = date('d');
+
+                // Empty slots
+                for ($i = 0; $i < $firstDay; $i++) echo "<div></div>";
+
+                // Days
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $isToday = ($day == $today) ? 'cal-today shadow-md' : '';
+                    echo "<div class='cal-cell $isToday'>$day</div>";
+                }
+                ?>
             </div>
         </div>
     </aside>
 
     <script>
-        // 1. Welcome Animation
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const ov = document.getElementById('welcome-overlay');
-                ov.style.opacity = '0';
-                ov.style.visibility = 'hidden';
-            }, 1800);
-        });
+        // JS only for clock and interactions
+        window.addEventListener('load', () => setTimeout(() => {
+            document.getElementById('welcome-overlay').style.opacity = '0';
+            document.getElementById('welcome-overlay').style.visibility = 'hidden';
+        }, 1500));
 
-        // 2. Mouse Glow (Blue)
+        // Clock
+        function updateClock() {
+            document.getElementById('php-clock').innerText = new Date().toLocaleTimeString('es-MX', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Mouse
         const glow = document.getElementById('cursor-glow');
-        let mouseX = window.innerWidth / 2,
-            mouseY = window.innerHeight / 2;
-
         document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            // Immediate update for responsiveness
-            glow.style.left = mouseX + 'px';
-            glow.style.top = mouseY + 'px';
+            requestAnimationFrame(() => {
+                glow.style.left = e.clientX + 'px';
+                glow.style.top = e.clientY + 'px';
+            });
         });
 
-        // 3. Navigation
+        // Switcher
         function switchSection(id) {
             document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
-            const btn = Array.from(document.querySelectorAll('.nav-link')).find(b => b.textContent.toLowerCase().includes(id) || b.getAttribute('onclick').includes(id));
+            const btn = Array.from(document.querySelectorAll('.nav-link')).find(b => b.getAttribute('onclick')?.includes(id));
             if (btn) btn.classList.add('active');
-
             document.querySelectorAll('.section-view').forEach(s => s.classList.add('hidden'));
             document.getElementById('section-' + id).classList.remove('hidden');
         }
-
-        // 4. Gadget Logic
-        function updateGadget() {
-            const now = new Date();
-
-            // Time
-            document.getElementById('live-clock').innerText = now.toLocaleTimeString('es-MX', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-
-            // Date
-            const dateStr = now.toLocaleDateString('es-MX', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long'
-            });
-            document.getElementById('live-date').innerText = dateStr;
-
-            // Calendar
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            document.getElementById('cal-month').innerText = monthNames[now.getMonth()];
-
-            renderCal(now);
-        }
-
-        function renderCal(date) {
-            const container = document.getElementById('mini-calendar');
-            if (container.children.length > 0 && container.getAttribute('data-month') == date.getMonth()) return;
-
-            container.innerHTML = '';
-            container.setAttribute('data-month', date.getMonth());
-
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const today = new Date().getDate();
-
-            // Padding
-            for (let i = 0; i < firstDay; i++) {
-                container.appendChild(document.createElement('div'));
-            }
-
-            // Days
-            for (let i = 1; i <= daysInMonth; i++) {
-                const el = document.createElement('div');
-                el.className = "w-6 h-6 flex items-center justify-center rounded-full text-xs text-stone-600 mb-0.5 mx-auto";
-                el.innerText = i;
-
-                if (i === today) {
-                    el.classList.add('bg-sky-500', 'text-white', 'font-bold', 'shadow-md');
-                    el.classList.remove('text-stone-600');
-                }
-                container.appendChild(el);
-            }
-        }
-
-        setInterval(updateGadget, 1000);
-        updateGadget();
     </script>
 </body>
 
