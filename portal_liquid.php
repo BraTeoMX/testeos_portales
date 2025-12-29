@@ -5,65 +5,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intimark Portal 2026</title>
-    <!-- Usamos el CSS compilado localmente -->
     <link href="./dist/output.css" rel="stylesheet">
 
     <style>
-        /* Tipografía System Apple-style */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            cursor: none;
-            /* Ocultamos el cursor por defecto para usar el personalizado */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* cursor: none; REMOVED per user request */
         }
 
-        /* Cursor Personalizado (Glow Warm) */
+        /* Cursor Glow (Blue Light) */
         #cursor-glow {
             position: fixed;
             top: 0;
             left: 0;
-            width: 600px;
-            height: 600px;
+            width: 400px;
+            /* Reduced size */
+            height: 400px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(251, 146, 60, 0.15) 0%, rgba(251, 146, 60, 0) 70%);
+            /* Sky Blue Gradient */
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0) 70%);
             transform: translate(-50%, -50%);
             pointer-events: none;
             mix-blend-mode: multiply;
-            /* Fusión suave con el fondo */
-            z-index: 9999;
-            transition: background 0.5s ease;
+            z-index: 0;
+            /* Behind everything */
+            transition: background 0.3s ease;
         }
 
-        /* Pequeño puntero central para precisión */
-        #cursor-dot {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 8px;
-            height: 8px;
-            background-color: rgba(251, 146, 60, 0.8);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 10000;
-            transition: transform 0.1s ease-out;
-            box-shadow: 0 0 10px rgba(251, 146, 60, 0.5);
+        /* Nav Pills - Liquid Effect */
+        .glass-pill-nav {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        /* Animación y Pantalla de Bienvenida */
+        .nav-link {
+            position: relative;
+            z-index: 10;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Active State: White floating pill */
+        .nav-link.active {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            color: #0c4a6e;
+            /* Sky-900 */
+        }
+
+        .nav-link:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Welcome Animation */
         #welcome-overlay {
             position: fixed;
             inset: 0;
             background-color: #f5f5f4;
-            /* Stone-100 */
-            z-index: 100;
+            z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.8s ease-out, visibility 0.8s;
+            transition: opacity 0.8s, visibility 0.8s;
         }
 
         .welcome-logo {
-            width: 150px;
             animation: breathe-float 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
 
@@ -84,55 +91,6 @@
             }
         }
 
-        /* Liquid Navigation Active State */
-        .nav-link {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link.active {
-            color: #1c1917;
-            /* Stone-900 */
-            font-weight: 600;
-        }
-
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 4px;
-            background-color: #f97316;
-            /* Orange-500 */
-            border-radius: 50%;
-            box-shadow: 0 0 5px #f97316;
-        }
-
-        /* Glassmorphism Utilities */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.7);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Animaciones generales */
         .fade-in {
             animation: fadeIn 0.8s ease-out forwards;
             opacity: 0;
@@ -150,72 +108,41 @@
             }
         }
 
-        /* Habilitar cursor pointer en elementos interactivos */
-        a,
-        button,
-        input,
-        .cursor-pointer {
-            cursor: none;
-            /* Mantenemos 'none' para que el custom cursor haga el trabajo, 
-                             pero usamos JS para hover states si es necesario */
+        /* Calendar Grid Fix */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
         }
     </style>
 </head>
-<!-- Fondo intermedio amigable: Stone-100 (Cálido gris claro) -->
 
-<body class="bg-stone-100 text-stone-800 h-screen overflow-hidden selection:bg-orange-200 selection:text-orange-900">
+<body class="bg-stone-100 text-stone-800 h-screen overflow-hidden selection:bg-sky-200 selection:text-sky-900">
 
-    <!-- Custom Cursor Elements -->
     <div id="cursor-glow"></div>
-    <div id="cursor-dot"></div>
 
     <!-- Welcome Overlay -->
     <div id="welcome-overlay">
-        <img src="img/logo.png" alt="Logo" class="welcome-logo object-contain">
+        <img src="img/logo.png" alt="Logo" class="welcome-logo w-32 object-contain">
     </div>
 
-    <!-- Liquid Top Navigation (Hidden on mobile initially, visible on md+) -->
-    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-40 hidden md:flex items-center gap-1 p-1.5 rounded-full glass-panel fade-in" style="animation-delay: 1.6s;">
-
-        <button onclick="switchSection('avisos')" class="nav-link active px-6 py-2 rounded-full text-sm text-stone-600 hover:bg-white/50 transition duration-300">
-            Avisos
-        </button>
-
-        <div class="w-px h-4 bg-stone-300 mx-1"></div>
-
-        <button onclick="switchSection('portales')" class="nav-link px-6 py-2 rounded-full text-sm text-stone-600 hover:bg-white/50 transition duration-300">
-            Portales
-        </button>
-
-        <div class="w-px h-4 bg-stone-300 mx-1"></div>
-
-        <button onclick="switchSection('perfil')" class="nav-link px-6 py-2 rounded-full text-sm text-stone-600 hover:bg-white/50 transition duration-300">
-            Mi Perfil
-        </button>
+    <!-- Liquid Nav -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 hidden md:flex p-1.5 rounded-full glass-pill-nav fade-in" style="animation-delay: 1.2s;">
+        <button onclick="switchSection('avisos')" class="nav-link active px-6 py-2 rounded-full text-sm font-medium text-stone-600">Avisos</button>
+        <button onclick="switchSection('portales')" class="nav-link px-6 py-2 rounded-full text-sm font-medium text-stone-600">Portales</button>
+        <button onclick="switchSection('perfil')" class="nav-link px-6 py-2 rounded-full text-sm font-medium text-stone-600">Mi Perfil</button>
     </nav>
 
-    <!-- Mobile Menu Toggle (Visible only on small screens) -->
-    <div class="md:hidden fixed top-4 right-4 z-50">
-        <button class="p-3 bg-white/80 backdrop-blur-md rounded-full shadow-lg text-stone-700">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-            </svg>
-        </button>
-    </div>
+    <!-- Main Content -->
+    <main class="relative h-full w-full pt-28 px-4 md:px-12 lg:px-24 pb-12 overflow-y-auto z-10">
 
-    <!-- Main Content Container -->
-    <main class="relative h-full w-full pt-28 px-4 md:px-12 lg:px-24 pb-12 overflow-y-auto">
-
-        <!-- Section: Portales (Default Hidden, managed by JS) -->
+        <!-- Portales View -->
         <section id="section-portales" class="section-view hidden fade-in max-w-7xl mx-auto">
-            <header class="mb-12 text-center md:text-left">
-                <h1 class="text-4xl font-bold tracking-tight text-stone-800 mb-2">Hola, bienvenido de nuevo.</h1>
-                <p class="text-stone-500 text-lg">Selecciona un portal para comenzar tu trabajo.</p>
+            <header class="mb-8">
+                <h1 class="text-3xl font-light tracking-tight text-stone-800">Menú <span class="font-bold text-sky-600">Principal</span></h1>
             </header>
 
-            <!-- Grid de Portales -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Portal Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <?php
                 $apps = [
                     ['RH', 'SGD Vacaciones', 'Gestión de permisos', 'emerald-500', 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 'http://128.150.102.131:8000'],
@@ -225,26 +152,17 @@
                     ['RH', 'Intimedia', 'Cursos Online', 'purple-500', 'M12 14l9-5-9-5-9 5 9 5z', 'http://128.150.102.75/moodle/'],
                     ['LOG', 'Paquetería', 'Entradas/Salidas', 'cyan-500', 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z', 'http://128.150.102.40/registro_paqueteria'],
                 ];
-
                 foreach ($apps as $app): ?>
-                    <a href="<?= $app[5] ?>" target="_blank" class="glass-card rounded-3xl p-6 relative group overflow-hidden block">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-<?= $app[3] ?>/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-
-                        <div class="relative z-10 flex flex-col h-full">
-                            <div class="flex justify-between items-start mb-4">
-                                <span class="text-[10px] font-bold tracking-widest text-stone-400 uppercase"><?= $app[0] ?></span>
-                                <div class="w-10 h-10 rounded-full bg-<?= $app[3] ?>/10 flex items-center justify-center text-<?= $app[3] ?>">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $app[4] ?>"></path>
-                                    </svg>
-                                </div>
+                    <a href="<?= $app[5] ?>" target="_blank" class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-white hover:border-sky-300 hover:shadow-lg hover:shadow-sky-100 transition-all duration-300 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-<?= $app[3] ?>/10 flex items-center justify-center text-<?= $app[3] ?> group-hover:scale-110 transition-transform">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $app[4] ?>"></path>
+                                </svg>
                             </div>
-
-                            <h3 class="text-lg font-bold text-stone-800 mb-1 group-hover:text-amber-600 transition-colors"><?= $app[1] ?></h3>
-                            <p class="text-sm text-stone-500 mb-6"><?= $app[2] ?></p>
-
-                            <div class="mt-auto flex items-center text-xs font-semibold text-<?= $app[3] ?> opacity-60 group-hover:opacity-100 transition-opacity">
-                                Abrir sistema <span class="ml-1 text-lg leading-none">&rarr;</span>
+                            <div>
+                                <h3 class="font-bold text-stone-800 group-hover:text-black"><?= $app[1] ?></h3>
+                                <p class="text-xs text-stone-500"><?= $app[2] ?></p>
                             </div>
                         </div>
                     </a>
@@ -252,283 +170,166 @@
             </div>
         </section>
 
-        <!-- Section: Avisos (Default Visible) -->
-        <section id="section-avisos" class="section-view fade-in max-w-6xl mx-auto" style="display: block;"> <!-- Init Visible -->
-            <div class="flex flex-col md:flex-row gap-12">
+        <!-- Avisos View -->
+        <section id="section-avisos" class="section-view fade-in max-w-6xl mx-auto block">
+            <header class="mb-8">
+                <h2 class="text-3xl font-light text-stone-800">Tablero de <span class="font-bold text-sky-600">Avisos</span></h2>
+            </header>
 
-                <!-- Main Board -->
-                <div class="flex-1">
-                    <header class="mb-8">
-                        <h2 class="text-3xl font-light text-stone-800">Tablero de <span class="font-bold text-amber-600">Avisos</span></h2>
-                    </header>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Main Notice -->
+                <div class="md:col-span-2 bg-white/60 backdrop-blur-md rounded-3xl p-8 border border-white shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-xs font-bold">IMPORTANTE</span>
+                        <span class="text-xs text-stone-400">Hace 2 horas</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-3">Mantenimiento Global de Servidores</h3>
+                    <p class="text-stone-600">
+                        Se informa a todo el personal que este fin de semana se realizará una actualización crítica.
+                        Los servicios podrían presentar intermitencia el sábado de 14:00 a 16:00 hrs.
+                    </p>
+                </div>
 
-                    <div class="grid grid-cols-1 gap-4">
-                        <!-- Featured Notice -->
-                        <div class="glass-card rounded-3xl p-8 border-l-4 border-l-amber-500">
-                            <span class="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold mb-4">IMPORTANTE</span>
-                            <h3 class="text-2xl font-bold text-stone-800 mb-3">Mantenimiento Global de Servidores</h3>
-                            <p class="text-stone-600 leading-relaxed">
-                                Se informa a todo el personal que este fin de semana se realizará una actualización crítica en la infraestructura.
-                                Los servicios podrían presentar intermitencia el sábado de 14:00 a 16:00 hrs.
-                            </p>
-                            <div class="mt-6 flex items-center gap-3 text-sm text-stone-400">
-                                <span>Publicado por: Sistemas</span>
-                                <span>&bull;</span>
-                                <span>Hace 2 horas</span>
-                            </div>
-                        </div>
-
-                        <!-- Secondary Notices -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="glass-card rounded-3xl p-6">
-                                <span class="text-blue-500 text-xs font-bold uppercase">Recursos Humanos</span>
-                                <h4 class="font-bold text-lg text-stone-800 mt-2">Nómina Disponible</h4>
-                                <p class="text-sm text-stone-500 mt-2">Ya puedes descargar tus recibos correspondientes a la quincena actual.</p>
-                            </div>
-
-                            <div class="glass-card rounded-3xl p-6">
-                                <span class="text-emerald-500 text-xs font-bold uppercase">Seguridad</span>
-                                <h4 class="font-bold text-lg text-stone-800 mt-2">Simulacro de Evacuación</h4>
-                                <p class="text-sm text-stone-500 mt-2">El próximo miércoles a las 11:00 AM se activará la alarma general.</p>
-                            </div>
-                        </div>
+                <!-- Side Notices -->
+                <div class="flex flex-col gap-4">
+                    <div class="bg-white/60 backdrop-blur-md rounded-3xl p-6 border border-white shadow-sm hover:bg-white transition-colors cursor-pointer">
+                        <h4 class="font-bold text-stone-800 text-sm mb-1">Nómina Disponible</h4>
+                        <p class="text-xs text-stone-500">Descarga tus recibos de la quincena.</p>
+                    </div>
+                    <div class="bg-white/60 backdrop-blur-md rounded-3xl p-6 border border-white shadow-sm hover:bg-white transition-colors cursor-pointer">
+                        <h4 class="font-bold text-stone-800 text-sm mb-1">Simulacro</h4>
+                        <p class="text-xs text-stone-500">Miércoles 11:00 AM, punto de reunión patio.</p>
                     </div>
                 </div>
-
-                <!-- Right Sidebar / Gadget Space (Desktop) -->
-                <!-- Gadget Area (Sticky) -->
-                <div class="hidden xl:block w-80 shrink-0">
-                    <!-- Gadget is handled by fixed positioning in "Floating Gadget" below for aesthetic compliance with request, 
-                        but we leave this space in grid to prevent overlap if we wanted inline. 
-                        Actually user asked for "Corner Gadget". Let's put it fixed bottom-right or top-right.
-                        I'll use fixed positioning as requested "como un gadget".
-                   -->
-                </div>
-
             </div>
         </section>
 
     </main>
 
-    <!-- Floating Elegant Gadget (Bottom Right) -->
-    <aside class="fixed bottom-8 right-8 z-30 hidden lg:flex flex-col gap-4 animate-slide-up" style="animation-delay: 1.8s;">
+    <!-- FLOATING GADGET (Revised: Small, Auto-adjusting position, Correct Grid) -->
+    <!-- Placing it Fixed Top Right to avoid 'footer' overlap issues, and scaled down -->
+    <aside class="fixed top-24 right-8 z-30 hidden lg:block w-56 animate-fade-in-up">
 
-        <!-- Date/Time Card -->
-        <div class="glass-panel rounded-3xl p-6 text-center w-72 backdrop-blur-2xl bg-white/80 border border-white/60 shadow-2xl">
-            <div id="live-clock" class="text-4xl font-light text-stone-800 tracking-tight font-variant-numeric tabular-nums">
-                --:--:--
-            </div>
-            <div id="live-date" class="text-xs font-bold text-stone-500 uppercase tracking-widest mt-2 border-t border-stone-200 pt-2">
-                Cargando fecha...
-            </div>
-        </div>
+        <!-- Glass Container -->
+        <div class="bg-white/70 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl p-4 transform transition-all hover:scale-105">
 
-        <!-- Calendar Card -->
-        <div class="glass-panel rounded-3xl p-6 w-72 backdrop-blur-2xl bg-white/80 border border-white/60 shadow-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="cal-title" class="text-sm font-bold text-stone-800 capitalize">Diciembre</h3>
-                <div class="flex gap-1">
-                    <div class="w-1.5 h-1.5 rounded-full bg-red-400"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-yellow-400"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+            <!-- Clock -->
+            <div class="text-center mb-4 border-b border-gray-200 pb-3">
+                <div id="live-clock" class="text-2xl font-light text-stone-800 font-mono tracking-tight">--:--</div>
+                <div id="live-date" class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1">...</div>
+            </div>
+
+            <!-- Calendar -->
+            <div>
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h3 id="cal-month" class="text-xs font-bold text-stone-700 capitalize">...</h3>
                 </div>
-            </div>
 
-            <!-- Days Header -->
-            <div class="grid grid-cols-7 text-center mb-2">
-                <span class="text-[10px] font-bold text-stone-400">D</span>
-                <span class="text-[10px] font-bold text-stone-400">L</span>
-                <span class="text-[10px] font-bold text-stone-400">M</span>
-                <span class="text-[10px] font-bold text-stone-400">M</span>
-                <span class="text-[10px] font-bold text-stone-400">J</span>
-                <span class="text-[10px] font-bold text-stone-400">V</span>
-                <span class="text-[10px] font-bold text-stone-400">S</span>
-            </div>
+                <div class="calendar-grid text-[10px] font-bold text-stone-400 mb-1 text-center">
+                    <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
+                </div>
 
-            <!-- Calendar Grid -->
-            <div id="mini-calendar" class="grid grid-cols-7 gap-1 text-center">
-                <!-- JS Injected -->
+                <!-- Explicit Grid Container for Days -->
+                <div id="mini-calendar" class="calendar-grid text-center">
+                    <!-- JS Injected -->
+                </div>
             </div>
         </div>
     </aside>
 
     <script>
-        // --- 1. Welcome Animation Management ---
+        // 1. Welcome Animation
         window.addEventListener('load', () => {
-            const overlay = document.getElementById('welcome-overlay');
-            // Wait 1.5s for animation then fade out
             setTimeout(() => {
-                overlay.style.opacity = '0';
-                overlay.style.visibility = 'hidden';
+                const ov = document.getElementById('welcome-overlay');
+                ov.style.opacity = '0';
+                ov.style.visibility = 'hidden';
             }, 1800);
         });
 
-        // --- 2. Custom Cursor Logic (Warm Follower) ---
-        const cursorGlow = document.getElementById('cursor-glow');
-        const cursorDot = document.getElementById('cursor-dot');
-        const root = document.documentElement;
+        // 2. Mouse Glow (Blue)
+        const glow = document.getElementById('cursor-glow');
+        let mouseX = window.innerWidth / 2,
+            mouseY = window.innerHeight / 2;
 
         document.addEventListener('mousemove', (e) => {
-            const {
-                clientX: x,
-                clientY: y
-            } = e;
-
-            // Move dot instantly
-            cursorDot.style.left = x + 'px';
-            cursorDot.style.top = y + 'px';
-
-            // Move glow with slight delay/smoothing (CSS transition handles smoothing)
-            // But we update position immediately, let CSS lag slightly if needed or just track
-            cursorGlow.style.left = x + 'px';
-            cursorGlow.style.top = y + 'px';
-
-            // Dynamic Color Shift based on screen position (Subtle)
-            // Warm range: Orange (251, 146, 60) -> Rose (251, 113, 133) -> Amber (251, 191, 36)
-            const xPct = x / window.innerWidth;
-            const yPct = y / window.innerHeight;
-
-            // Calculate a warm hue shift (approx 20deg to 50deg)
-            // Orange is ~30. 
-            const hue = 30 + (xPct * 20) - (yPct * 10);
-            cursorGlow.style.background = `radial-gradient(circle, hsla(${hue}, 90%, 60%, 0.15) 0%, rgba(0,0,0,0) 70%)`;
-            cursorDot.style.backgroundColor = `hsla(${hue}, 90%, 60%, 0.9)`;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            // Immediate update for responsiveness
+            glow.style.left = mouseX + 'px';
+            glow.style.top = mouseY + 'px';
         });
 
-        // Mouse Down Effect
-        document.addEventListener('mousedown', () => {
-            cursorDot.style.transform = 'translate(-50%, -50%) scale(0.8)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.9)';
-        });
+        // 3. Navigation
+        function switchSection(id) {
+            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+            const btn = Array.from(document.querySelectorAll('.nav-link')).find(b => b.textContent.toLowerCase().includes(id) || b.getAttribute('onclick').includes(id));
+            if (btn) btn.classList.add('active');
 
-        document.addEventListener('mouseup', () => {
-            cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
-
-        // Interactive Elements Hover Effect
-        const interactiveSelectors = 'a, button, input, .cursor-pointer, .glass-card';
-        document.querySelectorAll(interactiveSelectors).forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursorDot.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                cursorDot.style.opacity = '0.5';
-                cursorGlow.style.width = '700px'; // Grow glow
-                cursorGlow.style.height = '700px';
-            });
-            el.addEventListener('mouseleave', () => {
-                cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
-                cursorDot.style.opacity = '1';
-                cursorGlow.style.width = '600px';
-                cursorGlow.style.height = '600px';
-            });
-        });
-
-
-        // --- 3. Navigation Logic ---
-        function switchSection(secId) {
-            // Update Menu
-            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-            // Find button (heuristic: based on text or onclick) - Simplifying matching by just setting all inactive and active logic separately? 
-            // Better: Pass `this` or match by text. Let's rely on cleaning all and highlighting clicked.
-            const targetBtn = Array.from(document.querySelectorAll('.nav-link')).find(b => b.textContent.trim().toLowerCase().includes(secId) || (secId === 'avisos' && b.textContent.includes('Avisos')));
-            if (targetBtn) targetBtn.classList.add('active');
-
-            // Hide all sections
-            document.querySelectorAll('.section-view').forEach(el => el.classList.add('hidden'));
-
-            // Show target
-            const target = document.getElementById('section-' + secId);
-            if (target) {
-                target.classList.remove('hidden');
-                // Retrigger animation
-                target.classList.remove('fade-in');
-                void target.offsetWidth; // trigger reflow
-                target.classList.add('fade-in');
-            } else {
-                // If section doesn't exist (e.g. Profil), standard fallback or alert
-                // For this demo, show Avisos if not found or just alert
-                if (secId === 'perfil') return;
-                document.getElementById('section-avisos').classList.remove('hidden');
-            }
+            document.querySelectorAll('.section-view').forEach(s => s.classList.add('hidden'));
+            document.getElementById('section-' + id).classList.remove('hidden');
         }
 
-        // Init default active
-        // (Avisos is default in HTML)
-
-
-        // --- 4. Gadget Logic (Clock & Calendar) ---
+        // 4. Gadget Logic
         function updateGadget() {
             const now = new Date();
 
-            // Clock
-            const timeStr = now.toLocaleTimeString('es-MX', {
-                hour12: false
-            }); // 11:46:12
-            document.getElementById('live-clock').textContent = timeStr;
+            // Time
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('es-MX', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
 
-            // Date Text
-            const dateOptions = {
+            // Date
+            const dateStr = now.toLocaleDateString('es-MX', {
                 weekday: 'long',
                 day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            };
-            const dateStr = now.toLocaleDateString('es-MX', dateOptions);
-            // Capitalize first letter
-            document.getElementById('live-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+                month: 'long'
+            });
+            document.getElementById('live-date').innerText = dateStr;
 
             // Calendar
-            renderMiniCalendar(now);
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            document.getElementById('cal-month').innerText = monthNames[now.getMonth()];
+
+            renderCal(now);
         }
 
-        let lastRenderedMonth = -1;
+        function renderCal(date) {
+            const container = document.getElementById('mini-calendar');
+            if (container.children.length > 0 && container.getAttribute('data-month') == date.getMonth()) return;
 
-        function renderMiniCalendar(date) {
-            const month = date.getMonth();
+            container.innerHTML = '';
+            container.setAttribute('data-month', date.getMonth());
+
             const year = date.getFullYear();
-
-            // Only re-render if month changed
-            if (month === lastRenderedMonth) return;
-            lastRenderedMonth = month;
-
-            const daysContainer = document.getElementById('mini-calendar');
-            const title = document.getElementById('cal-title');
-
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            title.textContent = `${monthNames[month]} ${year}`;
-
-            daysContainer.innerHTML = '';
-
+            const month = date.getMonth();
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const todayDate = new Date().getDate();
-            const isCurrentMonth = new Date().getMonth() === month;
+            const today = new Date().getDate();
 
-            // Empty slots
+            // Padding
             for (let i = 0; i < firstDay; i++) {
-                daysContainer.appendChild(document.createElement('div'));
+                container.appendChild(document.createElement('div'));
             }
 
             // Days
             for (let i = 1; i <= daysInMonth; i++) {
-                const dayEl = document.createElement('div');
-                dayEl.textContent = i;
-                dayEl.className = "h-8 w-8 flex items-center justify-center rounded-full text-xs text-stone-600 mx-auto transition-colors hover:bg-stone-100 cursor-pointer";
+                const el = document.createElement('div');
+                el.className = "w-6 h-6 flex items-center justify-center rounded-full text-xs text-stone-600 mb-0.5 mx-auto";
+                el.innerText = i;
 
-                if (isCurrentMonth && i === todayDate) {
-                    dayEl.classList.add('bg-amber-500', 'text-white', 'font-bold', 'shadow-md');
-                    dayEl.classList.remove('text-stone-600', 'hover:bg-stone-100');
+                if (i === today) {
+                    el.classList.add('bg-sky-500', 'text-white', 'font-bold', 'shadow-md');
+                    el.classList.remove('text-stone-600');
                 }
-
-                daysContainer.appendChild(dayEl);
+                container.appendChild(el);
             }
         }
 
         setInterval(updateGadget, 1000);
-        updateGadget(); // Init
-
-        // Initialize animation for default section
-        switchSection('avisos');
+        updateGadget();
     </script>
 </body>
 
