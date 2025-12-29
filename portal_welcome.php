@@ -311,39 +311,69 @@
                     this.randomness = Math.random() * 0.2;
                 }
 
-                update() {
-                    // 1. Move towards eased mouse pos
+                update(particles) {
+                    // 1. ATTRACTION & REPULSION from mouse
                     let dx = easedMouse.x - this.x;
                     let dy = easedMouse.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
 
-                    // Force strength
-                    if (dist < 500) {
-                        let force = (500 - dist) / 5000; // gentle attraction
-                        this.vx += dx * force;
-                        this.vy += dy * force;
+                    const repelRadius = 80; // Dead zone around cursor
+                    const attractRadius = 400; // Attraction zone
+
+                    if (dist < repelRadius && dist > 0) {
+                        // REPEL strongly when too close (prevents touching cursor)
+                        let repelForce = (repelRadius - dist) / repelRadius * 0.8;
+                        this.vx -= (dx / dist) * repelForce;
+                        this.vy -= (dy / dist) * repelForce;
+                    } else if (dist < attractRadius && dist > repelRadius) {
+                        // ATTRACT gently when in range
+                        let attractForce = (attractRadius - dist) / attractRadius * 0.15;
+                        this.vx += (dx / dist) * attractForce;
+                        this.vy += (dy / dist) * attractForce;
+
+                        // TANGENTIAL force for spiral/orbital effect
+                        let tangentX = -dy / dist;
+                        let tangentY = dx / dist;
+                        let orbitalForce = 0.05;
+                        this.vx += tangentX * orbitalForce;
+                        this.vy += tangentY * orbitalForce;
                     }
 
-                    // 2. Add organic noise (random wander)
-                    this.vx += (Math.random() - 0.5) * 0.5;
-                    this.vy += (Math.random() - 0.5) * 0.5;
+                    // 2. INTER-PARTICLE REPULSION (push away from each other)
+                    particles.forEach(other => {
+                        if (other === this) return;
 
-                    // 3. Max speed limit
+                        let pdx = this.x - other.x;
+                        let pdy = this.y - other.y;
+                        let pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+
+                        if (pdist < 30 && pdist > 0) {
+                            let pushForce = (30 - pdist) / 30 * 0.3;
+                            this.vx += (pdx / pdist) * pushForce;
+                            this.vy += (pdy / pdist) * pushForce;
+                        }
+                    });
+
+                    // 3. Add subtle organic noise (random wander)
+                    this.vx += (Math.random() - 0.5) * 0.3;
+                    this.vy += (Math.random() - 0.5) * 0.3;
+
+                    // 4. Max speed limit
                     let speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-                    if (speed > 4) {
-                        this.vx = (this.vx / speed) * 4;
-                        this.vy = (this.vy / speed) * 4;
+                    if (speed > 5) {
+                        this.vx = (this.vx / speed) * 5;
+                        this.vy = (this.vy / speed) * 5;
                     }
 
-                    // 4. Update pos
+                    // 5. Update position
                     this.x += this.vx;
                     this.y += this.vy;
 
-                    // 5. Friction
+                    // 6. Apply friction
                     this.vx *= this.friction;
                     this.vy *= this.friction;
 
-                    // 6. Wrap around edges
+                    // 7. Wrap around edges
                     if (this.x < 0) this.x = width;
                     if (this.x > width) this.x = 0;
                     if (this.y < 0) this.y = height;
@@ -374,7 +404,7 @@
                 ctx.clearRect(0, 0, width, height);
 
                 particles.forEach(p => {
-                    p.update();
+                    p.update(particles); // Pass particles array for inter-particle collision
                     p.draw();
                 });
 
