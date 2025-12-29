@@ -7,10 +7,8 @@
     <title>Intimark Ultimate</title>
     <link href="./dist/output.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
-
         body {
-            font-family: 'DM Sans', sans-serif;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
             background-color: #f3f4f6;
             color: #1f2937;
         }
@@ -48,38 +46,55 @@
         }
 
         /* --- Calendar Widget --- */
-        .calendar-day {
-            transition: background-color 0.2s;
-        }
-
-        .calendar-day:hover:not(.empty) {
-            background-color: #e5e7eb;
+        /* --- Calendar Widget Refined --- */
+        .calendar-cell {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
-        }
-
-        .calendar-day.today {
-            background-color: #3b82f6;
-            color: white;
-            border-radius: 50%;
-            font-weight: bold;
-        }
-
-        .calendar-day.holiday {
+            transition: all 0.2s;
             position: relative;
-            color: #ef4444;
-            font-weight: bold;
         }
 
-        .calendar-day.holiday::after {
+        .calendar-cell:hover:not(.empty) {
+            background-color: #f3f4f6;
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .calendar-cell.today {
+            background-color: #2563eb;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+        }
+
+        .calendar-cell.holiday {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .calendar-cell.holiday::after {
             content: '';
             position: absolute;
-            bottom: 2px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 4px;
+            /* Ajuste fino */
             width: 4px;
             height: 4px;
             background-color: #ef4444;
             border-radius: 50%;
+        }
+
+        .calendar-cell.today.holiday {
+            background-color: #2563eb;
+            /* Today gana el fondo */
+            color: white;
+        }
+
+        .calendar-cell.today.holiday::after {
+            background-color: white;
+            /* Dot blanco en fondo azul */
         }
 
         /* --- Toast Notifications --- */
@@ -120,6 +135,22 @@
             transform: translateX(4px);
             color: #3b82f6;
         }
+
+        /* Modal Calendar */
+        .modal-calendar {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 60;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-calendar.open {
+            display: flex;
+        }
     </style>
 </head>
 
@@ -141,7 +172,7 @@
                 </svg>
                 <div class="absolute left-14 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Inicio</div>
             </button>
-            <button class="nav-item w-full h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors relative group" title="Calendario">
+            <button class="nav-item w-full h-12 rounded-xl flex items-center justify-center text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors relative group" title="Calendario" onclick="openCalendarModal()">
                 <svg class="w-6 h-6 sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
@@ -155,11 +186,7 @@
             </button>
         </nav>
 
-        <div class="mt-auto">
-            <button class="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-200 to-slate-300 flex items-center justify-center text-slate-600 font-bold text-xs ring-2 ring-white">
-                ME
-            </button>
-        </div>
+        <div class="mt-auto"></div>
     </aside>
 
     <!-- Main Wrapper -->
@@ -212,40 +239,55 @@
         <aside class="w-80 bg-white border-l border-gray-200 hidden xl:flex flex-col p-6 overflow-y-auto">
 
             <!-- Calendar Widget -->
-            <div class="mb-8">
-                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    Calendario
-                </h3>
-                <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="font-bold text-sm text-gray-700" id="cal-month-year">Diciembre 2025</span>
+            <!-- Calendar Widget Refined -->
+            <div class="mb-8 p-1"> <!-- Padding extra para shadows -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                    <!-- Clock Section -->
+                    <div class="mb-6 pb-6 border-b border-gray-100 flex justify-between items-end">
+                        <div>
+                            <h2 class="text-4xl font-bold text-gray-800 tracking-tight leading-none" id="clock-time">--:--</h2>
+                            <p class="text-gray-400 font-bold uppercase tracking-wide text-[10px] mt-2" id="clock-date">Cargando...</p>
+                        </div>
+                        <!-- Simple Nav -->
                         <div class="flex gap-1">
-                            <button class="p-1 hover:bg-gray-200 rounded" onclick="changeMonth(-1)">‹</button>
-                            <button class="p-1 hover:bg-gray-200 rounded" onclick="changeMonth(1)">›</button>
+                            <button onclick="changeMonth(-1)" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <button onclick="changeMonth(1)" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-7 text-center text-xs text-gray-400 mb-2">
-                        <div>D</div>
-                        <div>L</div>
-                        <div>M</div>
-                        <div>M</div>
-                        <div>J</div>
-                        <div>V</div>
-                        <div>S</div>
+
+                    <!-- Month Label -->
+                    <div class="text-center mb-4">
+                        <span class="text-sm font-bold text-gray-800 capitalize" id="cal-month-year">...</span>
                     </div>
-                    <div class="grid grid-cols-7 gap-1 text-center text-sm" id="calendar-days">
+
+                    <!-- Grid Headers -->
+                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400 uppercase mb-2">
+                        <div>Do</div>
+                        <div>Lu</div>
+                        <div>Ma</div>
+                        <div>Mi</div>
+                        <div>Ju</div>
+                        <div>Vi</div>
+                        <div>Sa</div>
+                    </div>
+
+                    <!-- Days Grid -->
+                    <div class="grid grid-cols-7 gap-1 text-sm font-medium text-gray-600" id="calendar-days">
                         <!-- Days injected JS -->
                     </div>
-                    <div class="mt-4 pt-4 border-t border-gray-200">
-                        <p class="text-xs text-blue-500 font-medium flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-blue-500"></span> Hoy
-                        </p>
-                        <p class="text-xs text-red-500 font-medium flex items-center gap-1 mt-1">
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span> Festivo Obligatorio
-                        </p>
+
+                    <!-- Legend -->
+                    <div class="mt-6 flex items-center justify-center gap-4 text-[10px] text-gray-400 font-medium">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-600"></span> Hoy</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span> Festivo</span>
                     </div>
                 </div>
             </div>
@@ -285,291 +327,402 @@
 
     </div>
 
+    <!-- Calendar Modal -->
+    <div id="calendar-modal" class="modal-calendar" onclick="closeCalendarModal(event)">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm m-4 shadow-2xl animate-fade-in-up" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Calendario
+                </h3>
+                <button onclick="closeCalendarModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="modal-calendar-container"></div>
+        </div>
+    </div>
+
     <!-- MAIN SCRIPT -->
     <script>
-        // --- DATA ---
-        const services = [{
-                id: 1,
-                title: 'SGD Vacaciones',
-                category: 'RH',
-                desc: 'Solicitud y gestión de permisos vacacionales.',
-                url: 'http://128.150.102.131:8000',
-                icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
-                color: 'text-pink-500',
-                keywords: 'descanso faltas nomina'
-            },
-            {
-                id: 2,
-                title: 'Mesa de Ayuda',
-                category: 'TI',
-                desc: 'Reporta fallas de equipos, impresoras o red.',
-                url: 'http://128.150.102.131:8080/intimark/public/',
-                icon: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z',
-                color: 'text-blue-500',
-                keywords: 'soporte ticket ayuda'
-            },
-            {
-                id: 3,
-                title: 'Avances Producción',
-                category: 'Producción',
-                desc: 'Monitoreo en tiempo real de líneas y eficiencias.',
-                url: 'http://128.150.102.40:8010',
-                icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-                color: 'text-orange-500',
-                keywords: 'kpi eficiencia reporte'
-            },
-            {
-                id: 4,
-                title: 'Directorio',
-                category: 'Corporativo',
-                desc: 'Encuentra extensiones y correos del personal.',
-                url: 'http://128.150.102.131:85/',
-                icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z',
-                color: 'text-gray-500',
-                keywords: 'telefono contacto mail'
-            },
-            {
-                id: 5,
-                title: 'Intimedia',
-                category: 'RH',
-                desc: 'Capacitación y cursos obligatorios en línea.',
-                url: 'http://128.150.102.75/moodle/',
-                icon: 'M12 14l9-5-9-5-9 5 9 5z',
-                color: 'text-purple-500',
-                keywords: 'escuela aprender examen'
-            },
-            {
-                id: 6,
-                title: 'Paquetería',
-                category: 'Logística',
-                desc: 'Registro de entradas y salidas de paquetes.',
-                url: 'http://128.150.102.40/registro_paqueteria',
-                icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z',
-                color: 'text-cyan-500',
-                keywords: 'envios dhl fedex almacen'
-            },
-            {
-                id: 7,
-                title: 'Salas',
-                category: 'Servicios',
-                desc: 'Reserva salas de juntas para reuniones.',
-                url: 'http://128.150.102.131:86/',
-                icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
-                color: 'text-indigo-500',
-                keywords: 'reunion junta apartado'
-            },
-            {
-                id: 8,
-                title: 'Eficiencias',
-                category: 'Producción',
-                desc: 'Tableros detallados de desempeño por módulo.',
-                url: 'http://128.150.102.131/eficiencias',
-                icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-                color: 'text-emerald-500',
-                keywords: 'graficas reporte costura'
-            },
-        ];
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATA ---
+            const services = [{
+                    id: 1,
+                    title: 'SGD Vacaciones',
+                    category: 'RH',
+                    desc: 'Solicitud y gestión de permisos vacacionales.',
+                    url: 'http://128.150.102.131:8000',
+                    icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+                    color: 'text-pink-500',
+                    keywords: 'descanso faltas nomina'
+                },
+                {
+                    id: 2,
+                    title: 'Mesa de Ayuda',
+                    category: 'TI',
+                    desc: 'Reporta fallas de equipos, impresoras o red.',
+                    url: 'http://128.150.102.131:8080/intimark/public/',
+                    icon: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z',
+                    color: 'text-blue-500',
+                    keywords: 'soporte ticket ayuda'
+                },
+                {
+                    id: 3,
+                    title: 'Avances Producción',
+                    category: 'Producción',
+                    desc: 'Monitoreo en tiempo real de líneas y eficiencias.',
+                    url: 'http://128.150.102.40:8010',
+                    icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+                    color: 'text-orange-500',
+                    keywords: 'kpi eficiencia reporte'
+                },
+                {
+                    id: 4,
+                    title: 'Directorio',
+                    category: 'Corporativo',
+                    desc: 'Encuentra extensiones y correos del personal.',
+                    url: 'http://128.150.102.131:85/',
+                    icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z',
+                    color: 'text-gray-500',
+                    keywords: 'telefono contacto mail'
+                },
+                {
+                    id: 5,
+                    title: 'Intimedia',
+                    category: 'RH',
+                    desc: 'Capacitación y cursos obligatorios en línea.',
+                    url: 'http://128.150.102.75/moodle/',
+                    icon: 'M12 14l9-5-9-5-9 5 9 5z',
+                    color: 'text-purple-500',
+                    keywords: 'escuela aprender examen'
+                },
+                {
+                    id: 6,
+                    title: 'Paquetería',
+                    category: 'Logística',
+                    desc: 'Registro de entradas y salidas de paquetes.',
+                    url: 'http://128.150.102.40/registro_paqueteria',
+                    icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z',
+                    color: 'text-cyan-500',
+                    keywords: 'envios dhl fedex almacen'
+                },
+                {
+                    id: 7,
+                    title: 'Salas',
+                    category: 'Servicios',
+                    desc: 'Reserva salas de juntas para reuniones.',
+                    url: 'http://128.150.102.131:86/',
+                    icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
+                    color: 'text-indigo-500',
+                    keywords: 'reunion junta apartado'
+                },
+                {
+                    id: 8,
+                    title: 'Eficiencias',
+                    category: 'Producción',
+                    desc: 'Tableros detallados de desempeño por módulo.',
+                    url: 'http://128.150.102.131/eficiencias',
+                    icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+                    color: 'text-emerald-500',
+                    keywords: 'graficas reporte costura'
+                },
+            ];
 
-        const holidays = {
-            '1-1': 'Año Nuevo',
-            '2-5': 'Día de la Constitución',
-            '3-21': 'Natalicio de Benito Juárez',
-            '5-1': 'Día del Trabajo',
-            '9-16': 'Día de la Independencia',
-            '11-20': 'Revolución Mexicana',
-            '12-25': 'Navidad'
-        };
+            const holidays = {
+                '1-1': 'Año Nuevo',
+                '2-5': 'Día de la Constitución',
+                '3-21': 'Natalicio de Benito Juárez',
+                '5-1': 'Día del Trabajo',
+                '9-16': 'Día de la Independencia',
+                '11-20': 'Revolución Mexicana',
+                '12-25': 'Navidad'
+            };
 
-        // --- DOM ---
-        const grid = document.getElementById('elastic-grid');
-        const searchInput = document.getElementById('smartSearch');
+            // --- DOM ---
+            const grid = document.getElementById('elastic-grid');
+            const searchInput = document.getElementById('smartSearch');
 
-        // --- RENDER CARDS ---
-        function renderCards(items) {
-            grid.innerHTML = '';
+            // --- RENDER CARDS ---
+            function renderCards(items) {
+                grid.innerHTML = '';
 
-            if (items.length === 0) {
-                document.getElementById('no-results').classList.remove('hidden');
-                return;
-            }
-            document.getElementById('no-results').classList.add('hidden');
+                if (items.length === 0) {
+                    document.getElementById('no-results').classList.remove('hidden');
+                    return;
+                }
+                document.getElementById('no-results').classList.add('hidden');
 
-            items.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = "elastic-card bg-white rounded-2xl p-6 border border-gray-100 flex flex-col justify-between group cursor-pointer";
-                card.onclick = () => window.open(item.url, '_blank');
+                items.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = "elastic-card bg-white rounded-2xl p-6 border border-gray-100 flex flex-col justify-between group cursor-pointer";
+                    card.onclick = () => window.open(item.url, '_blank');
 
-                // Content
-                card.innerHTML = `
-                    <div>
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center ${item.color}">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}"></path></svg>
+                    // Content
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center ${item.color}">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}"></path></svg>
+                                </div>
+                                <span class="px-2 py-1 text-[10px] uppercase font-bold text-gray-400 bg-gray-100 rounded-lg group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">${item.category}</span>
                             </div>
-                            <span class="px-2 py-1 text-[10px] uppercase font-bold text-gray-400 bg-gray-100 rounded-lg group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">${item.category}</span>
+                            <h3 class="text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">${item.title}</h3>
+                            <p class="text-sm text-gray-500 leading-relaxed">${item.desc}</p>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">${item.title}</h3>
-                        <p class="text-sm text-gray-500 leading-relaxed">${item.desc}</p>
-                    </div>
 
-                    <!-- Hidden Actions (Reveal on Hover) -->
-                    <div class="card-actions pt-4 border-t border-gray-100 mt-4 flex items-center justify-between">
-                         <button class="text-xs font-bold text-blue-600 flex items-center gap-1 hover:underline">
-                            Acceder 
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                        </button>
-                        <button class="text-gray-400 hover:text-amber-400 transition-colors" title="Favorito" onclick="event.stopPropagation(); showToast('success', '${item.title} agregado a favoritos');">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
-                        </button>
+                        <!-- Hidden Actions (Reveal on Hover) -->
+                        <div class="card-actions pt-4 border-t border-gray-100 mt-4 flex items-center justify-between">
+                             <button class="text-xs font-bold text-blue-600 flex items-center gap-1 hover:underline">
+                                Acceder 
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </button>
+                            <button class="text-gray-400 hover:text-amber-400 transition-colors" title="Favorito" onclick="event.stopPropagation(); showToast('success', '${item.title} agregado a favoritos');">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            // --- FUZZY SEARCH ---
+            function cleanString(str) {
+                return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
+            }
+
+            searchInput.addEventListener('keyup', (e) => {
+                const query = cleanString(e.target.value);
+
+                // Remove active tabs when searching
+                document.querySelectorAll('.cat-btn').forEach(b => {
+                    b.classList.remove('border-b-blue-500', 'active', 'border-b-2');
+                    b.classList.add('bg-transparent', 'border-transparent');
+                });
+
+                const results = services.filter(svc => {
+                    const combined = cleanString(svc.title + " " + svc.category + " " + svc.desc + " " + (svc.keywords || ''));
+                    return combined.includes(query);
+                });
+
+                renderCards(results);
+            });
+
+            window.clearSearch = function() { // Expose to global scope
+                searchInput.value = '';
+                filterApps('all');
+            }
+
+            window.filterApps = function(cat) { // Expose to global scope
+                // UI Update
+                document.querySelectorAll('.cat-btn').forEach(btn => {
+                    // Reset styles
+                    btn.classList.remove('bg-white', 'shadow-sm', 'text-gray-600', 'border-b-2', 'border-b-blue-500');
+                    btn.classList.add('bg-transparent', 'text-gray-500');
+                });
+                // Highlight clicked
+                if (event && event.target) {
+                    event.target.classList.remove('bg-transparent', 'text-gray-500');
+                    event.target.classList.add('bg-white', 'shadow-sm', 'text-gray-600', 'border-b-2', 'border-b-blue-500');
+                }
+
+                if (cat === 'all') {
+                    renderCards(services);
+                } else {
+                    const filtered = services.filter(s => s.category === cat);
+                    renderCards(filtered);
+                }
+            }
+
+            // --- CALENDAR WIDGET ---
+            let currentDate = new Date();
+
+            window.changeMonth = function(delta) {
+                currentDate.setMonth(currentDate.getMonth() + delta);
+                renderCalendar('all');
+            }
+
+            window.openCalendarModal = function() {
+                // Check if existing sidebar is visible (large screens)
+                if (window.innerWidth >= 1280) return; // Don't open modal on XL screens
+
+                const modal = document.getElementById('calendar-modal');
+                const container = document.getElementById('modal-calendar-container');
+
+                // Clone the calendar structure into modal if empty
+                if (container.innerHTML === '') {
+                    // Find the original sidebar calendar to clone
+                    const originalCal = document.querySelector('aside .bg-white.rounded-3xl');
+
+                    if (originalCal) {
+                        const calHTML = originalCal.innerHTML;
+                        const wrapper = document.createElement('div');
+                        wrapper.innerHTML = calHTML;
+                        wrapper.className = 'bg-gray-50 rounded-2xl p-4 border border-gray-100';
+                        // Remove IDs from cloned content to avoid duplicates
+                        wrapper.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+
+                        container.appendChild(wrapper);
+
+                        // Re-bind events for the modal buttons since they are new elements
+                        // We need to find the buttons by their SVG content or position
+                        const btns = wrapper.querySelectorAll('button');
+                        if (btns.length >= 2) {
+                            btns[0].onclick = () => changeMonth(-1);
+                            btns[1].onclick = () => changeMonth(1);
+                        }
+                    }
+                }
+
+                // Re-render to ensure sync
+                renderCalendar('modal');
+                modal.classList.add('open');
+            }
+
+            window.closeCalendarModal = function(e) {
+                if (e) e.stopPropagation();
+                document.getElementById('calendar-modal').classList.remove('open');
+            }
+
+            function renderCalendar(target = 'sidebar') {
+                const containers = [];
+
+                // 1. Sidebar Calendar
+                if (target === 'sidebar' || target === 'all') {
+                    const sidebarCal = document.querySelector('aside .bg-white.rounded-3xl'); // More specific selector
+                    if (sidebarCal) containers.push(sidebarCal);
+                }
+
+                // 2. Modal Calendar
+                if (target === 'modal' || target === 'all') {
+                    const modalCont = document.getElementById('modal-calendar-container');
+                    if (modalCont && modalCont.firstElementChild) {
+                        containers.push(modalCont.firstElementChild);
+                    }
+                }
+
+                containers.forEach(container => {
+                    // Re-select elements within this specific container
+                    // Look for the Month Label (which has capitalize class)
+                    const monthYear = container.querySelector('.capitalize');
+                    // Look for the grid that holds the days (grid-cols-7)
+                    const dayContainer = container.querySelector('.grid.grid-cols-7.gap-1.text-sm');
+
+                    if (!monthYear || !dayContainer) return;
+
+                    // Reset
+                    dayContainer.innerHTML = '';
+
+                    const month = currentDate.getMonth();
+                    const year = currentDate.getFullYear();
+
+                    const firstDay = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                    monthYear.innerText = `${months[month]} ${year}`;
+
+                    // Empty slots
+                    for (let i = 0; i < firstDay; i++) {
+                        const empty = document.createElement('div');
+                        empty.className = 'p-2 empty select-none';
+                        dayContainer.appendChild(empty);
+                    }
+
+                    const today = new Date();
+
+                    for (let i = 1; i <= daysInMonth; i++) {
+                        const dayEl = document.createElement('div');
+                        dayEl.innerText = i;
+                        dayEl.className = 'p-2 text-gray-700 calendar-day cursor-default rounded-full flex items-center justify-center w-8 h-8 mx-auto';
+
+                        // Highlight Today
+                        if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                            dayEl.classList.add('bg-blue-600', 'text-white', 'font-bold', 'shadow-md');
+                        }
+
+                        // Holidays
+                        const holidayKey = `${month+1}-${i}`;
+                        if (holidays[holidayKey]) {
+                            dayEl.classList.add('text-red-500', 'font-bold');
+                            dayEl.title = holidays[holidayKey];
+                        }
+
+                        dayContainer.appendChild(dayEl);
+                    }
+                });
+            }
+
+            // --- CLOCK WIDGET ---
+            function updateClock() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+
+                const timeEl = document.getElementById('clock-time');
+                if (timeEl) timeEl.innerText = `${hours}:${minutes}`;
+
+                const dateEl = document.getElementById('clock-date');
+                if (dateEl) {
+                    const options = {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    };
+                    dateEl.innerText = now.toLocaleDateString('es-ES', options);
+                }
+
+                setTimeout(updateClock, 1000);
+            }
+
+            // --- TOAST NOTIFICATIONS ---
+            window.showToast = function(type, message) { // Expose global
+                const container = document.getElementById('toast-container');
+
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+
+                const icon = type === 'success' ? '✅' : 'ℹ️';
+
+                toast.style.borderLeftColor = type === 'success' ? '#22c55e' : '#3b82f6';
+
+                toast.innerHTML = `
+                    <div class="text-xl">${icon}</div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800">${type === 'success' ? 'Completado' : 'Información'}</p>
+                        <p class="text-xs text-gray-500">${message}</p>
                     </div>
                 `;
-                grid.appendChild(card);
-            });
-        }
 
-        // --- FUZZY SEARCH ---
-        function cleanString(str) {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
-        }
+                container.appendChild(toast);
 
-        searchInput.addEventListener('keyup', (e) => {
-            const query = cleanString(e.target.value);
+                // Trigger animation
+                requestAnimationFrame(() => {
+                    toast.classList.add('show');
+                });
 
-            // Remove active tabs when searching
-            document.querySelectorAll('.cat-btn').forEach(b => {
-                b.classList.remove('border-b-blue-500', 'active', 'border-b-2');
-                b.classList.add('bg-transparent', 'border-transparent');
-            });
-
-            const results = services.filter(svc => {
-                const combined = cleanString(svc.title + " " + svc.category + " " + svc.desc + " " + (svc.keywords || ''));
-                return combined.includes(query);
-            });
-
-            renderCards(results);
-        });
-
-        function clearSearch() {
-            searchInput.value = '';
-            filterApps('all');
-        }
-
-        // --- FILTER ---
-        function filterApps(cat) {
-            // UI Update
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                // Reset styles
-                btn.classList.remove('bg-white', 'shadow-sm', 'text-gray-600', 'border-b-2', 'border-b-blue-500');
-                btn.classList.add('bg-transparent', 'text-gray-500');
-            });
-            // Highlight clicked (simplificamos la logica de selección for demo)
-            event.target.classList.remove('bg-transparent', 'text-gray-500');
-            event.target.classList.add('bg-white', 'shadow-sm', 'text-gray-600', 'border-b-2', 'border-b-blue-500');
-
-            if (cat === 'all') {
-                renderCards(services);
-            } else {
-                const filtered = services.filter(s => s.category === cat);
-                renderCards(filtered);
-            }
-        }
-
-        // --- CALENDAR WIDGET ---
-        let currentDate = new Date();
-
-        function renderCalendar() {
-            const monthYear = document.getElementById('cal-month-year');
-            const dayContainer = document.getElementById('calendar-days');
-
-            // Reset
-            dayContainer.innerHTML = '';
-
-            const month = currentDate.getMonth();
-            const year = currentDate.getFullYear();
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            monthYear.innerText = `${months[month]} ${year}`;
-
-            // Empty slots
-            for (let i = 0; i < firstDay; i++) {
-                const empty = document.createElement('div');
-                empty.className = 'p-2 empty';
-                dayContainer.appendChild(empty);
+                // Remove
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 400);
+                }, 4000);
             }
 
-            const today = new Date();
+            // --- INIT ---
+            renderCards(services);
+            renderCalendar('all');
+            updateClock();
 
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dayEl = document.createElement('div');
-                dayEl.innerText = i;
-                dayEl.className = 'p-2 text-gray-700 calendar-day cursor-default';
-
-                // Highlight Today
-                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                    dayEl.classList.add('today');
-                }
-
-                // Holidays
-                const holidayKey = `${month+1}-${i}`;
-                if (holidays[holidayKey]) {
-                    dayEl.classList.add('holiday');
-                    dayEl.title = holidays[holidayKey];
-                }
-
-                dayContainer.appendChild(dayEl);
-            }
-        }
-
-        function changeMonth(delta) {
-            currentDate.setMonth(currentDate.getMonth() + delta);
-            renderCalendar();
-        }
-
-        // --- TOAST NOTIFICATIONS ---
-        function showToast(type, message) {
-            const container = document.getElementById('toast-container');
-
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-
-            const icon = type === 'success' ? '✅' : 'ℹ️';
-            const colorClass = type === 'success' ? 'border-green-500' : 'border-blue-500';
-
-            toast.style.borderLeftColor = type === 'success' ? '#22c55e' : '#3b82f6';
-
-            toast.innerHTML = `
-                <div class="text-xl">${icon}</div>
-                <div>
-                    <p class="text-sm font-semibold text-gray-800">${type === 'success' ? 'Completado' : 'Información'}</p>
-                    <p class="text-xs text-gray-500">${message}</p>
-                </div>
-            `;
-
-            container.appendChild(toast);
-
-            // Trigger animation
-            requestAnimationFrame(() => {
-                toast.classList.add('show');
-            });
-
-            // Remove
+            // Welcome Toast
             setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 400);
-            }, 4000);
-        }
-
-        // --- INIT ---
-        renderCards(services);
-        renderCalendar();
-
-        // Welcome Toast
-        setTimeout(() => {
-            showToast('info', 'Bienvenido a tu nuevas experiencia Intimark.');
-        }, 1000);
+                showToast('info', 'Bienvenido a tu nueva experiencia Intimark.');
+            }, 1000);
+        });
     </script>
 </body>
 
