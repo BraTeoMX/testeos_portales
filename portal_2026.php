@@ -9,6 +9,7 @@
     <style>
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
         }
 
         /* Animation Keyframes */
@@ -44,35 +45,77 @@
             pointer-events: none;
         }
 
-        /* Navbar State Transitions */
-        #navbar-panel {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Sidebar */
+        #sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            z-index: 40;
+            padding: 2rem 1rem;
         }
 
-        #nav-logo {
-            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        #sidebar.collapsed {
+            transform: translateX(-100%);
         }
 
-        /* Scrolled State */
-        .scrolled #navbar-panel {
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-            background-color: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
+        #sidebar-toggle {
+            position: fixed;
+            left: 1rem;
+            top: 1rem;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
-        .scrolled #nav-logo {
-            height: 1.75rem;
-            /* h-7 equivalent */
+        #sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+
+        /* Search Bar */
+        #search-bar {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 2rem;
+            padding: 0.75rem 1.5rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        #search-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            background: transparent;
+            font-size: 1rem;
         }
 
         /* Active Navigation Item */
         .nav-active {
-            background-color: #0369a1 !important;
-            /* sky-700 */
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
             color: #ffffff !important;
             font-weight: 700 !important;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
         }
 
         /* Tooltip */
@@ -141,16 +184,78 @@
         .pulse {
             animation: pulse 2s infinite;
         }
+
+        /* Netflix-style hover for access cards */
+        .access-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .access-card {
+            flex: 1 1 calc(25% - 1rem);
+            min-width: 200px;
+            transition: transform 0.3s ease, z-index 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .access-card:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .access-card:not(:hover) {
+            transform: scale(0.95);
+        }
+
+        /* Menu indicator */
+        .menu-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background-color: #0369a1;
+            transition: width 0.3s ease, left 0.3s ease;
+            border-radius: 2px;
+        }
+
+        /* News card hover */
+        .news-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Icon gradients */
+        .icon-gradient-sky {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        }
+
+        .icon-gradient-emerald {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .icon-gradient-purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .icon-gradient-amber {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
     </style>
 </head>
 
-<body class="bg-stone-50 h-screen w-screen overflow-hidden font-sans relative">
+<body class="h-screen w-screen overflow-hidden font-sans relative">
 
     <!-- Background Canvas -->
     <canvas id="bg-canvas"></canvas>
 
     <!-- Welcome Overlay -->
-    <div id="welcome-screen" class="fixed inset-0 bg-stone-50 z-[100] flex items-center justify-center pointer-events-none">
+    <div id="welcome-screen" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
         <div class="relative flex flex-col items-center">
             <!-- Logo with Animation -->
             <img src="img/logo.png" alt="Intimark Logo" class="w-40 md:w-56 object-contain animate-welcome">
@@ -160,34 +265,45 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast">¡Nueva noticia disponible!</div>
 
-    <!-- Interface Content -->
-    <div id="main-interface" class="opacity-0 transition-opacity duration-1000 delay-500 h-full flex flex-col">
+    <!-- Sidebar Toggle -->
+    <button id="sidebar-toggle">
+        <svg class="w-6 h-6 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+    </button>
 
-        <!-- Sticky Navigation Bar -->
-        <nav id="navbar" class="sticky top-0 z-50 px-4 py-4 transition-all duration-300">
-            <!-- Inner Container -->
-            <div id="navbar-panel" class="max-w-4xl mx-auto bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-white/50 flex items-center justify-between p-4 box-border">
-
-                <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center">
-                    <img id="nav-logo" src="img/logo.png" alt="Logo" class="h-10 w-auto object-contain block">
-                </div>
-
-                <!-- Menu Items -->
-                <div class="flex items-center gap-1 md:gap-3">
-                    <button onclick="showSection('accesos')" id="btn-accesos" class="nav-item px-5 py-2 text-sm font-medium text-stone-600 rounded-xl transition-all duration-300 hover:bg-stone-100">
-                        Accesos Rápidos
-                    </button>
-                    <button onclick="showSection('noticias')" id="btn-noticias" class="nav-item px-5 py-2 text-sm font-medium text-stone-600 rounded-xl transition-all duration-300 hover:bg-stone-100">
-                        Noticias
-                    </button>
-                </div>
-            </div>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="flex items-center mb-8">
+            <img src="img/logo.png" alt="Logo" class="h-8 w-auto mr-3">
+            <h1 class="text-xl font-bold text-stone-800">Portal 2026</h1>
+        </div>
+        <nav class="space-y-2">
+            <button onclick="showSection('accesos')" id="btn-accesos" class="nav-item w-full text-left px-4 py-3 text-sm font-medium text-stone-600 rounded-xl transition-all duration-300 hover:bg-stone-100">
+                Accesos Rápidos
+            </button>
+            <button onclick="showSection('noticias')" id="btn-noticias" class="nav-item w-full text-left px-4 py-3 text-sm font-medium text-stone-600 rounded-xl transition-all duration-300 hover:bg-stone-100">
+                Noticias
+            </button>
         </nav>
+    </div>
+
+    <!-- Interface Content -->
+    <div id="main-interface" class="opacity-0 transition-opacity duration-1000 delay-500 h-full flex flex-col ml-0 transition-all duration-300" id="main-content">
+
+        <!-- Search Bar -->
+        <div class="px-4 py-4">
+            <div id="search-bar">
+                <svg class="w-5 h-5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input id="search-input" type="text" placeholder="Buscar en el portal...">
+            </div>
+        </div>
 
         <!-- Main Content Area -->
         <main class="flex-1 overflow-y-auto px-4 py-8 relative" id="scroll-container">
-            <div class="max-w-5xl mx-auto bg-white/40 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-lg border border-white/60 min-h-[80vh]">
+            <div class="max-w-5xl mx-auto bg-white/30 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-lg border border-white/50 min-h-[80vh]">
 
                 <!-- Section: Accesos Rápidos -->
                 <section id="section-accesos" class="content-section transition-all duration-500 opacity-100 translate-y-0">
@@ -195,44 +311,48 @@
                         <h2 class="text-3xl font-light text-stone-800">Accesos <span class="font-bold text-sky-600">Rápidos</span></h2>
                         <p class="text-stone-400 mt-2 text-sm">Herramientas y aplicaciones al alcance de un clic.</p>
                     </header>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <a href="#" class="tooltip bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 hover:-translate-y-2 transition-all duration-300 cursor-pointer group relative">
-                            <div class="w-12 h-12 bg-sky-50 text-sky-500 rounded-xl flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="access-grid">
+                        <div class="access-card tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group relative overflow-hidden">
+                            <div class="w-16 h-16 icon-gradient-sky text-white rounded-2xl flex items-center justify-center shadow-lg">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                                 </svg>
                             </div>
-                            <span class="font-medium text-stone-700 text-sm">Recursos Humanos</span>
+                            <span class="font-medium text-stone-800 text-sm">Recursos Humanos</span>
+                            <p class="text-stone-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Accede a tu perfil, solicitudes y beneficios.</p>
                             <span class="tooltip-text">Accede a tu perfil y solicitudes</span>
                             <div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full pulse" title="Nuevo"></div>
-                        </a>
-                        <a href="#" class="tooltip bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        </div>
+                        <div class="access-card tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
+                            <div class="w-16 h-16 icon-gradient-emerald text-white rounded-2xl flex items-center justify-center shadow-lg">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
-                            <span class="font-medium text-stone-700 text-sm">Solicitudes</span>
+                            <span class="font-medium text-stone-800 text-sm">Solicitudes</span>
+                            <p class="text-stone-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Gestiona tus solicitudes pendientes de forma rápida.</p>
                             <span class="tooltip-text">Gestiona tus solicitudes pendientes</span>
-                        </a>
-                        <a href="#" class="tooltip bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
-                            <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        </div>
+                        <div class="access-card tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
+                            <div class="w-16 h-16 icon-gradient-purple text-white rounded-2xl flex items-center justify-center shadow-lg">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                 </svg>
                             </div>
-                            <span class="font-medium text-stone-700 text-sm">Dashboard</span>
+                            <span class="font-medium text-stone-800 text-sm">Dashboard</span>
+                            <p class="text-stone-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Visualiza métricas, reportes y KPIs en tiempo real.</p>
                             <span class="tooltip-text">Visualiza métricas y reportes</span>
-                        </a>
-                        <a href="#" class="tooltip bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
-                            <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        </div>
+                        <div class="access-card tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
+                            <div class="w-16 h-16 icon-gradient-amber text-white rounded-2xl flex items-center justify-center shadow-lg">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10a2 2 0 002 2h4a2 2 0 002-2V11m-6 0h6"></path>
                                 </svg>
                             </div>
-                            <span class="font-medium text-stone-700 text-sm">Producción</span>
+                            <span class="font-medium text-stone-800 text-sm">Producción</span>
+                            <p class="text-stone-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Accede a herramientas de producción y control de calidad.</p>
                             <span class="tooltip-text">Accede a herramientas de producción</span>
-                        </a>
+                        </div>
                     </div>
                 </section>
 
@@ -244,29 +364,38 @@
                     </header>
 
                     <div class="grid gap-6">
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
+                        <div class="news-card bg-slate-50 rounded-2xl p-6 shadow-sm border border-stone-100">
                             <div class="flex items-center gap-3 mb-3">
                                 <span class="px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Importante</span>
                                 <span class="text-stone-400 text-xs">Hoy, 09:00 AM</span>
                             </div>
                             <h3 class="text-xl font-bold text-stone-800 mb-2">Mantenimiento Programado</h3>
                             <p class="text-stone-600">Se realizará un mantenimiento de los servidores este fin de semana. Esperamos su comprensión.</p>
+                            <div class="mt-4 opacity-0 transition-opacity duration-300 hover:opacity-100">
+                                <p class="text-stone-500 text-sm">Más detalles: El mantenimiento comenzará el sábado a las 10 PM y durará aproximadamente 4 horas.</p>
+                            </div>
                         </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
+                        <div class="news-card bg-slate-50 rounded-2xl p-6 shadow-sm border border-stone-100">
                             <div class="flex items-center gap-3 mb-3">
                                 <span class="px-2 py-1 bg-sky-100 text-sky-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Actualización</span>
                                 <span class="text-stone-400 text-xs">Ayer</span>
                             </div>
                             <h3 class="text-xl font-bold text-stone-800 mb-2">Nueva Política de Vacaciones</h3>
                             <p class="text-stone-600">Hemos actualizado el proceso de solicitud de días libres. Consulta el manual actualizado.</p>
+                            <div class="mt-4 opacity-0 transition-opacity duration-300 hover:opacity-100">
+                                <p class="text-stone-500 text-sm">Cambios principales: Mayor flexibilidad en fechas y aprobación automática para solicitudes menores a 5 días.</p>
+                            </div>
                         </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
+                        <div class="news-card bg-slate-50 rounded-2xl p-6 shadow-sm border border-stone-100">
                             <div class="flex items-center gap-3 mb-3">
                                 <span class="px-2 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-md">Evento</span>
                                 <span class="text-stone-400 text-xs">Hace 2 días</span>
                             </div>
                             <h3 class="text-xl font-bold text-stone-800 mb-2">Reunión Anual de Equipo</h3>
                             <p class="text-stone-600">La reunión anual se llevará a cabo el próximo mes. Agenda disponible próximamente.</p>
+                            <div class="mt-4 opacity-0 transition-opacity duration-300 hover:opacity-100">
+                                <p class="text-stone-500 text-sm">Fecha tentativa: 15 de enero. Incluirá presentaciones de proyectos y networking.</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -280,8 +409,10 @@
             const welcomeScreen = document.getElementById('welcome-screen');
             const mainInterface = document.getElementById('main-interface');
             const scrollContainer = document.getElementById('scroll-container');
-            const navbar = document.getElementById('navbar');
             const toast = document.getElementById('toast');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mainContent = document.getElementById('main-content');
 
             // 1. Welcome Animation
             setTimeout(() => {
@@ -293,16 +424,23 @@
             // 2. Initialize Section
             showSection('accesos');
 
-            // 3. Scroll Listener for Navbar State
-            scrollContainer.addEventListener('scroll', () => {
-                if (scrollContainer.scrollTop > 50) {
-                    navbar.classList.add('scrolled');
+            // 3. Sidebar Auto-hide after 3 seconds
+            setTimeout(() => {
+                sidebar.classList.add('collapsed');
+                mainContent.style.marginLeft = '0';
+            }, 3000);
+
+            // 4. Sidebar Toggle
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                if (sidebar.classList.contains('collapsed')) {
+                    mainContent.style.marginLeft = '0';
                 } else {
-                    navbar.classList.remove('scrolled');
+                    mainContent.style.marginLeft = '280px';
                 }
             });
 
-            // 4. Show Toast Notification after welcome
+            // 5. Show Toast Notification after welcome
             setTimeout(() => {
                 toast.classList.add('show');
                 setTimeout(() => {
@@ -311,7 +449,7 @@
                 }, 3000);
             }, 2500);
 
-            // 5. Background Swarm Animation
+            // 6. Background Swarm Animation
             initSwarm();
         });
 
