@@ -214,6 +214,47 @@
             transition: transform 0.3s ease, z-index 0.3s ease;
             cursor: pointer;
             position: relative;
+            overflow: visible;
+        }
+
+        .access-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 2rem;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            z-index: -1;
+            animation: aura-pulse 3s infinite;
+        }
+
+        .access-card.sky:hover::before {
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.5) 0%, transparent 70%);
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 1;
+        }
+
+        .access-card.emerald:hover::before {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.5) 0%, transparent 70%);
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 1;
+        }
+
+        .access-card.purple:hover::before {
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, transparent 70%);
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 1;
+        }
+
+        .access-card.amber:hover::before {
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 70%);
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 1;
         }
 
         .access-card:hover {
@@ -223,6 +264,17 @@
 
         .access-card:not(:hover) {
             transform: scale(0.95);
+        }
+
+        @keyframes aura-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.6;
+            }
         }
 
         /* Menu indicator */
@@ -239,6 +291,27 @@
         /* News card hover */
         .news-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .news-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            z-index: -1;
+        }
+
+        .news-card:hover::before {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 1;
         }
 
         .news-card:hover {
@@ -464,7 +537,7 @@
                         <p class="text-stone-400 mt-2 text-sm">Herramientas y aplicaciones al alcance de un clic.</p>
                     </header>
                     <div class="access-grid">
-                        <div class="access-card tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group relative overflow-hidden">
+                        <div class="access-card sky tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group relative overflow-hidden">
                             <div class="w-16 h-16 icon-gradient-sky text-white rounded-2xl flex items-center justify-center shadow-lg">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -475,7 +548,7 @@
                             <span class="tooltip-text">Accede a tu perfil y solicitudes</span>
                             <div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full pulse" title="Nuevo"></div>
                         </div>
-                        <div class="access-card tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
+                        <div class="access-card emerald tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
                             <div class="w-16 h-16 icon-gradient-emerald text-white rounded-2xl flex items-center justify-center shadow-lg">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -485,7 +558,7 @@
                             <p class="text-stone-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Gestiona tus solicitudes pendientes de forma rápida.</p>
                             <span class="tooltip-text">Gestiona tus solicitudes pendientes</span>
                         </div>
-                        <div class="access-card tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
+                        <div class="access-card purple tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
                             <div class="w-16 h-16 icon-gradient-purple text-white rounded-2xl flex items-center justify-center shadow-lg">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -495,7 +568,7 @@
                             <p class="text-stone-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Visualiza métricas, reportes y KPIs en tiempo real.</p>
                             <span class="tooltip-text">Visualiza métricas y reportes</span>
                         </div>
-                        <div class="access-card tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
+                        <div class="access-card amber tooltip bg-slate-50 p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group overflow-hidden">
                             <div class="w-16 h-16 icon-gradient-amber text-white rounded-2xl flex items-center justify-center shadow-lg">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10a2 2 0 002 2h4a2 2 0 002-2V11m-6 0h6"></path>
