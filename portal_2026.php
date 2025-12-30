@@ -64,6 +64,15 @@
             transform: translateX(-100%);
         }
 
+        @media (max-width: 768px) {
+            #sidebar {
+                display: none;
+            }
+            #sidebar-toggle {
+                display: none;
+            }
+        }
+
         #sidebar-toggle {
             position: fixed;
             left: 1rem;
@@ -80,6 +89,13 @@
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #sidebar-toggle.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         #sidebar-toggle:hover {
@@ -289,7 +305,15 @@
     </div>
 
     <!-- Interface Content -->
-    <div id="main-interface" class="opacity-0 transition-opacity duration-1000 delay-500 h-full flex flex-col ml-0 transition-all duration-300" id="main-content">
+    <div id="main-interface" class="opacity-0 transition-opacity duration-1000 delay-500 h-full flex flex-col ml-0 transition-all duration-300">
+
+        <!-- Date and Time -->
+        <div class="px-4 py-2 text-center">
+            <div id="datetime" class="text-stone-600">
+                <div id="date" class="text-lg font-medium"></div>
+                <div id="time" class="text-2xl font-bold"></div>
+            </div>
+        </div>
 
         <!-- Search Bar -->
         <div class="px-4 py-4">
@@ -412,33 +436,51 @@
             const toast = document.getElementById('toast');
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebar-toggle');
-            const mainContent = document.getElementById('main-content');
+            const mainContent = document.getElementById('main-interface');
 
             // 1. Welcome Animation
             setTimeout(() => {
                 welcomeScreen.style.opacity = '0';
                 mainInterface.classList.remove('opacity-0');
-                setTimeout(() => welcomeScreen.remove(), 500);
+                setTimeout(() => {
+                    welcomeScreen.remove();
+                    // 3. Sidebar Auto-hide after welcome
+                    setTimeout(() => {
+                        sidebar.classList.add('collapsed');
+                        updateMainContent();
+                    }, 1000); // 1 second after welcome
+                }, 500);
             }, 1800);
 
             // 2. Initialize Section
             showSection('accesos');
 
-            // 3. Sidebar Auto-hide after 3 seconds
-            setTimeout(() => {
-                sidebar.classList.add('collapsed');
-                mainContent.style.marginLeft = '0';
-            }, 3000);
+            // Initialize sidebar toggle visibility
+            updateMainContent();
 
             // 4. Sidebar Toggle
             sidebarToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('collapsed');
-                if (sidebar.classList.contains('collapsed')) {
-                    mainContent.style.marginLeft = '0';
-                } else {
-                    mainContent.style.marginLeft = '280px';
+                updateMainContent();
+            });
+
+            // 5. Hide sidebar on click outside
+            document.addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && !sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.add('collapsed');
+                    updateMainContent();
                 }
             });
+
+            function updateMainContent() {
+                if (sidebar.classList.contains('collapsed')) {
+                    mainContent.style.marginLeft = '0';
+                    sidebarToggle.classList.add('visible');
+                } else {
+                    mainContent.style.marginLeft = '280px';
+                    sidebarToggle.classList.remove('visible');
+                }
+            }
 
             // 5. Show Toast Notification after welcome
             setTimeout(() => {
@@ -449,7 +491,11 @@
                 }, 3000);
             }, 2500);
 
-            // 6. Background Swarm Animation
+            // 6. Update Date and Time
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // 7. Background Swarm Animation
             initSwarm();
         });
 
@@ -634,6 +680,25 @@
 
             resize();
             animate();
+        }
+
+        // Update Date and Time
+        function updateDateTime() {
+            const now = new Date();
+            const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+            const dayName = days[now.getDay()];
+            const day = now.getDate();
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            document.getElementById('date').textContent = `${dayName} ${day} de ${month} ${year}`;
+            document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
         }
     </script>
 </body>
